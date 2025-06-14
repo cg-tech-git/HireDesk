@@ -29,7 +29,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { ShoppingCart, ArrowBack } from '@mui/icons-material';
 import { Layout } from '@/components/Layout/Layout';
-import { equipmentService } from '@/services/equipment.service';
+import { equipmentService, categoryService } from '@/services/equipment.service';
 import { useBasket } from '@/contexts/BasketContext';
 import { differenceInDays, addDays, format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -52,6 +52,13 @@ export default function EquipmentDetailPage() {
     queryKey: ['equipment', id],
     queryFn: () => equipmentService.getEquipmentById(id),
     enabled: !!id,
+  });
+
+  // Fetch category details
+  const { data: category } = useQuery({
+    queryKey: ['category', equipment?.categoryId],
+    queryFn: () => categoryService.getCategoryById(equipment!.categoryId),
+    enabled: !!equipment?.categoryId,
   });
 
   // Fetch rate cards
@@ -189,7 +196,7 @@ export default function EquipmentDetailPage() {
             </Typography>
 
             <Chip
-              label={equipment.category?.name}
+              label={category?.name || 'Loading...'}
               color="primary"
               sx={{ mb: 2 }}
             />

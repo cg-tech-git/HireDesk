@@ -8,10 +8,13 @@ import {
   Grid,
   Card,
   CardContent,
+  Paper,
+  Divider,
 } from '@mui/material';
 import { ShoppingCart, Description } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { Layout } from '@/components/Layout/Layout';
+import { mockBrands } from '@/lib/mockData';
 
 export default function HomePage() {
   const router = useRouter();
@@ -103,6 +106,82 @@ export default function HomePage() {
               </Button>
             </Box>
           )}
+        </Box>
+
+        {/* Brands Section */}
+        <Box sx={{ py: 8 }}>
+          <Divider sx={{ mb: 6 }} />
+          <Typography variant="h4" component="h2" align="center" gutterBottom>
+            Trusted Equipment Brands
+          </Typography>
+          <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 6 }}>
+            We partner with world-leading manufacturers to provide you with the best equipment
+          </Typography>
+          
+          <Grid container spacing={3} justifyContent="center">
+            {mockBrands.map((brand) => (
+              <Grid item xs={6} sm={4} md={3} key={brand.id}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'grey.50',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 3,
+                      backgroundColor: 'background.paper',
+                    },
+                  }}
+                  onClick={() => router.push(`/equipment?brand=${brand.name}`)}
+                >
+                  <Box
+                    sx={{
+                      width: 120,
+                      height: 80,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 2,
+                    }}
+                  >
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                        filter: 'grayscale(100%)',
+                        opacity: 0.7,
+                        transition: 'all 0.3s ease',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.filter = 'grayscale(0%)';
+                        e.currentTarget.style.opacity = '1';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.filter = 'grayscale(100%)';
+                        e.currentTarget.style.opacity = '0.7';
+                      }}
+                    />
+                  </Box>
+                  <Typography variant="subtitle1" fontWeight="medium">
+                    {brand.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" align="center">
+                    {brand.description}
+                  </Typography>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
         </Box>
       </Container>
     </Layout>

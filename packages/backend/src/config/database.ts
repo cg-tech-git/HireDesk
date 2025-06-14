@@ -1,12 +1,15 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { createLogger } from './logger';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isTest = process.env.NODE_ENV === 'test';
+
+const logger = createLogger('database');
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
@@ -28,27 +31,30 @@ export const dataSourceOptions: DataSourceOptions = {
 export const AppDataSource = new DataSource(dataSourceOptions);
 
 // Connection helper
-export async function initializeDatabase(): Promise<DataSource> {
-  try {
-    if (!AppDataSource.isInitialized) {
+export async function initializeDatabase(retries = 3, delay = 5000): Promise<void> {
+  for (let i = 0; i < retries; i++) {
+    try {
       await AppDataSource.initialize();
-      console.log('Database connection established successfully');
+      logger.info('Database connection established');
+      return;
+    } catch (error) {
+      logger.error(`Database connection attempt ${i + 1} failed:`, error);
+      
+      if (i === retries - 1) {
+        logger.error('Database connection failed after all retries. Running in demo mode without database.');
+        // Instead of throwing, we'll continue running without database
+        return;
+      }
+      
+      logger.info(`Retrying in ${delay / 1000} seconds...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
-    return AppDataSource;
-  } catch (error) {
-    console.error('Error during database initialization:', error);
-    throw error;
   }
 }
 
 export async function closeDatabase(): Promise<void> {
-  try {
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
-      console.log('Database connection closed');
-    }
-  } catch (error) {
-    console.error('Error closing database connection:', error);
-    throw error;
+  if (AppDataSource.isInitialized) {
+    await AppDataSource.destroy();
+    logger.info('Database connection closed');
   }
 } 

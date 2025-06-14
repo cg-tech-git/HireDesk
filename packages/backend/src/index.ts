@@ -6,7 +6,7 @@ import * as path from 'path';
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 import { createApp } from './app';
-import { initializeDatabase, closeDatabase } from './config/database';
+import { initializeDatabase } from './config/database';
 import { createLogger } from './config/logger';
 
 const logger = createLogger('server');
@@ -14,45 +14,43 @@ const PORT = process.env.PORT || 3001;
 
 async function startServer() {
   try {
-    // Initialize database connection
+    // Try to initialize database but don't fail if it's not available
+    logger.info('Initializing database connection...');
     await initializeDatabase();
-    logger.info('Database connected successfully');
-
-    // Create and start Express app
-    const app = createApp();
     
+    const app = createApp();
+
     const server = app.listen(PORT, () => {
       logger.info(`Server is running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      
+      // Log available endpoints
+      logger.info('Available endpoints:');
+      logger.info(`  GET  http://localhost:${PORT}/api/v1/health`);
+      logger.info(`  POST http://localhost:${PORT}/api/v1/auth/register`);
+      logger.info(`  POST http://localhost:${PORT}/api/v1/auth/login`);
+      logger.info(`  GET  http://localhost:${PORT}/api/v1/equipment`);
+      logger.info(`  GET  http://localhost:${PORT}/api/v1/quotes`);
     });
 
     // Graceful shutdown
-    const gracefulShutdown = async (signal: string) => {
-      logger.info(`${signal} received, starting graceful shutdown`);
+    const gracefulShutdown = async () => {
+      logger.info('Received shutdown signal, closing server...');
       
-      server.close(async () => {
+      server.close(() => {
         logger.info('HTTP server closed');
-        
-        try {
-          await closeDatabase();
-          logger.info('Database connection closed');
-          process.exit(0);
-        } catch (error) {
-          logger.error({ error }, 'Error during shutdown');
-          process.exit(1);
-        }
+        process.exit(0);
       });
 
-      // Force shutdown after 30 seconds
+      // Force exit after 10 seconds
       setTimeout(() => {
         logger.error('Could not close connections in time, forcefully shutting down');
         process.exit(1);
-      }, 30000);
+      }, 10000);
     };
 
-    // Handle shutdown signals
-    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+    process.on('SIGTERM', gracefulShutdown);
+    process.on('SIGINT', gracefulShutdown);
 
     // Handle unhandled errors
     process.on('unhandledRejection', (reason, promise) => {
@@ -64,8 +62,8 @@ async function startServer() {
       process.exit(1);
     });
 
-  } catch (error) {
-    logger.error({ error }, 'Failed to start server');
+  } catch (error: any) {
+    logger.error('Failed to start server', { error });
     process.exit(1);
   }
 }

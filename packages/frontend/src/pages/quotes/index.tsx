@@ -26,6 +26,7 @@ import { Layout } from '@/components/Layout/Layout';
 import { api, apiEndpoints } from '@/lib/api';
 import { QuoteWithItems, QuoteStatus } from '@hiredesk/shared';
 import { format } from 'date-fns';
+import { mockQuotes } from '@/lib/mockData';
 
 interface QuotesResponse {
   success: boolean;
@@ -63,9 +64,27 @@ export default function QuotesPage() {
   const { data, isLoading, error } = useQuery<QuotesResponse>({
     queryKey: ['quotes', statusFilter],
     queryFn: async () => {
-      const params = statusFilter !== 'all' ? { status: statusFilter } : {};
-      const response = await api.get(apiEndpoints.quotes.myQuotes, { params });
-      return response.data;
+      try {
+        const params = statusFilter !== 'all' ? { status: statusFilter } : {};
+        const response = await api.get(apiEndpoints.quotes.myQuotes, { params });
+        return response.data;
+      } catch (error) {
+        // Use mock data in demo mode
+        const filteredQuotes = statusFilter === 'all' 
+          ? mockQuotes 
+          : mockQuotes.filter(q => q.status === statusFilter);
+        
+        return {
+          success: true,
+          data: filteredQuotes,
+          pagination: {
+            page: 1,
+            limit: 20,
+            total: filteredQuotes.length,
+            totalPages: 1,
+          },
+        };
+      }
     },
   });
 

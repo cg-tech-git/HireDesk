@@ -1,34 +1,27 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import {
-  User,
+  User as FirebaseUser,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   signInWithCustomToken,
+  UserCredential,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { UserRole } from '@hiredesk/shared';
+import { UserProfile, UserRole } from '@hiredesk/shared';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-
-interface UserProfile {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  company?: string;
-  phone?: string;
-}
+import { mockUser } from '@/lib/mockData';
 
 interface AuthContextType {
-  currentUser: User | null;
+  currentUser: FirebaseUser | null;
   userProfile: UserProfile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string, company?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<UserCredential | null>;
+  register: (email: string, password: string) => Promise<UserCredential | null>;
   logout: () => Promise<void>;
-  refreshToken: () => Promise<string | null>;
+  updateProfile: (profile: Partial<UserProfile>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,100 +39,50 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user profile from backend
-  const fetchUserProfile = async (user: User) => {
-    try {
-      const token = await user.getIdToken();
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  useEffect(() => {
+    if (!auth) {
+      // Running in demo mode without Firebase
+      // Set demo user
+      setCurrentUser({
+        uid: mockUser.id,
+        email: mockUser.email,
+        displayName: mockUser.displayName,
+      } as FirebaseUser);
+      
+      setUserProfile({
+        id: mockUser.id,
+        email: mockUser.email,
+        name: mockUser.displayName,
+        role: mockUser.role,
+        company: mockUser.company,
+        phone: mockUser.phone,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
       
-      if (response.data.success) {
-        setUserProfile(response.data.data);
-      }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      toast.error('Failed to load user profile');
+      setLoading(false);
+      return;
     }
-  };
 
-  // Login with email and password
-  const login = async (email: string, password: string) => {
-    try {
-      // First, authenticate with backend to get custom token
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`, {
-        email,
-        password,
-      });
-
-      if (response.data.success) {
-        // Sign in with custom token
-        await signInWithCustomToken(auth, response.data.data.customToken);
-        setUserProfile(response.data.data.user);
-        toast.success('Logged in successfully');
-      }
-    } catch (error: any) {
-      console.error('Login error:', error);
-      toast.error(error.response?.data?.error?.message || 'Failed to login');
-      throw error;
-    }
-  };
-
-  // Register new user
-  const register = async (email: string, password: string, name: string, company?: string) => {
-    try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`, {
-        email,
-        password,
-        confirmPassword: password,
-        name,
-        company,
-      });
-
-      if (response.data.success) {
-        // Sign in with email and password after registration
-        await signInWithEmailAndPassword(auth, email, password);
-        toast.success('Registration successful');
-      }
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      toast.error(error.response?.data?.error?.message || 'Failed to register');
-      throw error;
-    }
-  };
-
-  // Logout
-  const logout = async () => {
-    try {
-      await signOut(auth);
-      setUserProfile(null);
-      toast.success('Logged out successfully');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast.error('Failed to logout');
-    }
-  };
-
-  // Refresh token
-  const refreshToken = async (): Promise<string | null> => {
-    if (currentUser) {
-      return await currentUser.getIdToken(true);
-    }
-    return null;
-  };
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setCurrentUser(user);
       
       if (user) {
-        await fetchUserProfile(user);
+        // TODO: Fetch user profile from backend
+        setUserProfile({
+          id: user.uid,
+          email: user.email || '',
+          name: user.displayName || '',
+          role: UserRole.CUSTOMER,
+          company: '',
+          phone: '',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
       } else {
         setUserProfile(null);
       }
@@ -150,6 +93,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return unsubscribe;
   }, []);
 
+  const login = async (email: string, password: string): Promise<UserCredential | null> => {
+    if (!auth) {
+      throw new Error('Authentication is not available. Please configure Firebase.');
+    }
+    const { signInWithEmailAndPassword } = await import('firebase/auth');
+    return signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const register = async (email: string, password: string): Promise<UserCredential | null> => {
+    if (!auth) {
+      throw new Error('Authentication is not available. Please configure Firebase.');
+    }
+    const { createUserWithEmailAndPassword } = await import('firebase/auth');
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
+
+  const logout = async (): Promise<void> => {
+    if (!auth) {
+      setCurrentUser(null);
+      setUserProfile(null);
+      return;
+    }
+    const { signOut } = await import('firebase/auth');
+    await signOut(auth);
+  };
+
+  const updateProfile = async (profile: Partial<UserProfile>): Promise<void> => {
+    // TODO: Update profile in backend
+    if (userProfile) {
+      setUserProfile({ ...userProfile, ...profile });
+    }
+  };
+
   const value = {
     currentUser,
     userProfile,
@@ -157,7 +133,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
-    refreshToken,
+    updateProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -36,6 +36,7 @@ import {
   Logout as LogoutIcon,
   Assignment as AssignmentIcon,
   AdminPanelSettings as AdminIcon,
+  ShoppingCart as ShoppingCartIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBasket } from '@/contexts/BasketContext';
@@ -202,6 +203,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {/* Basket Icon in Header */}
+            {userProfile?.role === UserRole.CUSTOMER && (
+              <IconButton
+                color="inherit"
+                onClick={() => handleNavigation('/basket')}
+                sx={{ mr: 2 }}
+              >
+                <Badge badgeContent={getItemCount()} color="error">
+                  <ShoppingCartIcon />
+                </Badge>
+              </IconButton>
+            )}
+
             <Typography variant="body2" sx={{ mr: 2 }}>
               {userProfile?.name}
             </Typography>

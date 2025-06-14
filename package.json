@@ -1,0 +1,54 @@
+{
+  "name": "hiredesk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Industry-leading digital platform for equipment rental",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev:backend & npm run dev:frontend",
+    "dev:frontend": "npm run dev --workspace=@hiredesk/frontend",
+    "dev:backend": "npm run dev --workspace=@hiredesk/backend",
+    "build": "npm run build:shared && npm run build:backend && npm run build:frontend",
+    "build:frontend": "npm run build --workspace=@hiredesk/frontend",
+    "build:backend": "npm run build --workspace=@hiredesk/backend",
+    "build:shared": "npm run build --workspace=@hiredesk/shared",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write \"packages/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "prepare": "husky install",
+    "deploy:staging": "npm run deploy:staging --workspaces --if-present",
+    "deploy:production": "npm run deploy:production --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.1.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cg-tech-git/HireDesk.git"
+  },
+  "author": "HireDesk Team",
+  "license": "UNLICENSED"
+} 

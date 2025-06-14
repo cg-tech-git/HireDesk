@@ -20,18 +20,20 @@ export const createEquipmentSchema = z.object({
 
 export const updateEquipmentSchema = createEquipmentSchema.partial();
 
-export const createRateCardSchema = z.object({
+const rateCardBaseSchema = z.object({
   equipmentId: z.string(),
   durationMin: z.number().int().positive('Minimum duration must be positive'),
   durationMax: z.number().int().positive('Maximum duration must be positive'),
   dailyRate: z.number().positive('Daily rate must be positive'),
   isActive: z.boolean().default(true),
-}).refine((data: any) => data.durationMax >= data.durationMin, {
+});
+
+export const createRateCardSchema = rateCardBaseSchema.refine((data: any) => data.durationMax >= data.durationMin, {
   message: 'Maximum duration must be greater than or equal to minimum duration',
   path: ['durationMax'],
 });
 
-export const updateRateCardSchema = createRateCardSchema.partial();
+export const updateRateCardSchema = rateCardBaseSchema.partial();
 
 export const createServiceSchema = z.object({
   name: z.string().min(2, 'Service name must be at least 2 characters'),

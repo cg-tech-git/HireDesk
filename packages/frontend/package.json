@@ -10,7 +10,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.1",
+    "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@hiredesk/shared": "^1.0.0",
     "@mui/icons-material": "^5.15.0",

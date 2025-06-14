@@ -7,14 +7,16 @@ const nextConfig = {
     domains: ['storage.googleapis.com'], // For Google Cloud Storage images
   },
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
   async rewrites() {
+    // Only add rewrites if API URL is defined
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+        destination: `${apiUrl}/:path*`,
       },
     ];
   },

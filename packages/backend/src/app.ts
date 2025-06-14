@@ -8,11 +8,11 @@ import { logger } from './config/logger';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { initializeFirebase } from './config/firebase';
 
-// Import routes (to be created)
-// import authRoutes from './routes/auth';
-// import equipmentRoutes from './routes/equipment';
-// import quoteRoutes from './routes/quotes';
-// import adminRoutes from './routes/admin';
+// Import routes
+import authRoutes from './routes/auth.routes';
+import equipmentRoutes from './routes/equipment.routes';
+import quoteRoutes from './routes/quotes.routes';
+// import adminRoutes from './routes/admin.routes';
 
 export function createApp(): Express {
   const app = express();
@@ -77,9 +77,9 @@ export function createApp(): Express {
   });
 
   // Mount routes
-  // app.use('/api/v1/auth', authRoutes);
-  // app.use('/api/v1/equipment', equipmentRoutes);
-  // app.use('/api/v1/quotes', quoteRoutes);
+  app.use('/api/v1/auth', authRoutes);
+  app.use('/api/v1/equipment', equipmentRoutes);
+  app.use('/api/v1/quotes', quoteRoutes);
   // app.use('/api/v1/admin', adminRoutes);
 
   // 404 handler

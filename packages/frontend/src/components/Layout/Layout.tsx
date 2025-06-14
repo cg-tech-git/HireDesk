@@ -38,7 +38,9 @@ import {
   AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBasket } from '@/contexts/BasketContext';
 import { UserRole } from '@hiredesk/shared';
+import Badge from '@mui/material/Badge';
 
 const drawerWidth = 280;
 const drawerWidthCollapsed = 64;
@@ -52,6 +54,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { userProfile, logout } = useAuth();
+  const { getItemCount } = useBasket();
   
   const [open, setOpen] = useState(!isMobile);
   const [equipmentOpen, setEquipmentOpen] = useState(false);
@@ -121,7 +124,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       },
       {
         text: 'RFQ Basket',
-        icon: <RequestQuoteIcon />,
+        icon: (
+          <Badge badgeContent={getItemCount()} color="primary">
+            <RequestQuoteIcon />
+          </Badge>
+        ),
         path: '/basket',
         roles: [UserRole.CUSTOMER],
       },

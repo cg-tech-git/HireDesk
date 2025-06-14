@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { BasketProvider } from '@/contexts/BasketContext';
 import createEmotionCache from '@/lib/createEmotionCache';
 import theme from '@/styles/theme';
 
@@ -42,31 +43,33 @@ export default function MyApp(props: MyAppProps) {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
-              <Component {...pageProps} />
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: '#363636',
-                    color: '#fff',
-                  },
-                  success: {
-                    duration: 3000,
-                    iconTheme: {
-                      primary: '#4caf50',
-                      secondary: '#fff',
+              <BasketProvider>
+                <Component {...pageProps} />
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    duration: 4000,
+                    style: {
+                      background: '#363636',
+                      color: '#fff',
                     },
-                  },
-                  error: {
-                    duration: 5000,
-                    iconTheme: {
-                      primary: '#f44336',
-                      secondary: '#fff',
+                    success: {
+                      duration: 3000,
+                      iconTheme: {
+                        primary: '#4caf50',
+                        secondary: '#fff',
+                      },
                     },
-                  },
-                }}
-              />
+                    error: {
+                      duration: 5000,
+                      iconTheme: {
+                        primary: '#f44336',
+                        secondary: '#fff',
+                      },
+                    },
+                  }}
+                />
+              </BasketProvider>
             </AuthProvider>
             {/* <ReactQueryDevtools initialIsOpen={false} /> */}
           </QueryClientProvider>

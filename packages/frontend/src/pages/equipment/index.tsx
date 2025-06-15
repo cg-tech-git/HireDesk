@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   Container,
   Grid,
@@ -18,29 +18,43 @@ import {
   Select,
   MenuItem,
   InputAdornment,
+  Chip,
+  SelectChangeEvent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 import { Layout } from '@/components/Layout/Layout';
 import { equipmentService, categoryService } from '@/services/equipment.service';
-import { Equipment, Category } from '@hiredesk/shared';
+import { Equipment, EquipmentWithRelations, Category, PaginatedResponse } from '@hiredesk/shared';
+import { useBasket } from '@/contexts/BasketContext';
+import { toast } from 'react-hot-toast';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 export default function EquipmentPage() {
   const router = useRouter();
+  const { addItem } = useBasket();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedEquipment, setSelectedEquipment] = useState<EquipmentWithRelations | null>(null);
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   // Debounce search input
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearch(search);
+      setDebouncedSearch(searchQuery);
       setPage(1); // Reset to first page on search
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [searchQuery]);
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -49,20 +63,15 @@ export default function EquipmentPage() {
   });
 
   // Fetch equipment
-  const {
-    data: equipmentData,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['equipment', page, debouncedSearch, categoryId],
-    queryFn: () =>
-      equipmentService.getEquipment({
-        page,
-        limit: 12,
-        search: debouncedSearch || undefined,
-        categoryId: categoryId || undefined,
-      }),
-    keepPreviousData: true,
+  const { data: equipmentData, isLoading: isLoadingEquipment } = useQuery<PaginatedResponse<EquipmentWithRelations>>({
+    queryKey: ['equipment', page, selectedCategory, debouncedSearch],
+    queryFn: () => equipmentService.getEquipment({
+      page,
+      limit: 12,
+      categoryId: selectedCategory || undefined,
+      search: debouncedSearch || undefined,
+    }),
+    placeholderData: keepPreviousData,
   });
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -74,15 +83,29 @@ export default function EquipmentPage() {
     router.push(`/equipment/${id}`);
   };
 
-  const renderEquipmentCard = (equipment: Equipment) => (
+  const handleAddToBasket = (equipment: EquipmentWithRelations) => {
+    setSelectedEquipment(equipment);
+    setShowDatePicker(true);
+  };
+
+  const handleDateSelect = (startDate: Date, endDate: Date) => {
+    if (selectedEquipment) {
+      addItem(selectedEquipment, startDate.toISOString(), endDate.toISOString());
+      setShowDatePicker(false);
+      setSelectedEquipment(null);
+    }
+  };
+
+  const renderEquipmentCard = (equipment: EquipmentWithRelations) => (
     <Grid item xs={12} sm={6} md={4} key={equipment.id}>
       <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <CardMedia
           component="img"
           height="200"
-          image={equipment.images?.[0] || '/placeholder-equipment.jpg'}
+          image={equipment.images[0] || '/placeholder-equipment.jpg'}
           alt={equipment.name}
-          sx={{ objectFit: 'cover' }}
+          sx={{ cursor: 'pointer' }}
+          onClick={() => router.push(`/equipment/${equipment.id}`)}
         />
         <CardContent sx={{ flexGrow: 1 }}>
           <Typography gutterBottom variant="h6" component="h2">
@@ -101,9 +124,9 @@ export default function EquipmentPage() {
             size="small"
             variant="contained"
             fullWidth
-            onClick={() => handleViewDetails(equipment.id)}
+            onClick={() => handleAddToBasket(equipment)}
           >
-            View Details
+            Add to Basket
           </Button>
         </CardActions>
       </Card>
@@ -144,8 +167,8 @@ export default function EquipmentPage() {
               <TextField
                 fullWidth
                 placeholder="Search equipment..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -159,10 +182,10 @@ export default function EquipmentPage() {
               <FormControl fullWidth>
                 <InputLabel>Category</InputLabel>
                 <Select
-                  value={categoryId}
+                  value={selectedCategory}
                   label="Category"
                   onChange={(e) => {
-                    setCategoryId(e.target.value);
+                    setSelectedCategory(e.target.value);
                     setPage(1); // Reset to first page on category change
                   }}
                 >
@@ -179,39 +202,97 @@ export default function EquipmentPage() {
         </Box>
 
         {/* Equipment Grid */}
-        <Grid container spacing={3}>
-          {isLoading ? (
-            renderSkeleton()
-          ) : error ? (
-            <Grid item xs={12}>
-              <Typography color="error" align="center">
-                Error loading equipment. Please try again later.
-              </Typography>
-            </Grid>
-          ) : equipmentData?.data.length === 0 ? (
-            <Grid item xs={12}>
-              <Typography align="center" sx={{ py: 8 }}>
-                No equipment found matching your criteria.
-              </Typography>
-            </Grid>
-          ) : (
-            equipmentData?.data.map(renderEquipmentCard)
-          )}
-        </Grid>
+        {isLoadingEquipment ? (
+          renderSkeleton()
+        ) : equipmentData?.data.length === 0 ? (
+          <Grid item xs={12}>
+            <Typography align="center" sx={{ mt: 4 }}>
+              No equipment found matching your criteria
+            </Typography>
+          </Grid>
+        ) : (
+          <Grid container spacing={3}>
+            {equipmentData?.data.map(renderEquipmentCard)}
+          </Grid>
+        )}
 
         {/* Pagination */}
         {equipmentData && equipmentData.pagination.totalPages > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
             <Pagination
               count={equipmentData.pagination.totalPages}
               page={page}
               onChange={handlePageChange}
               color="primary"
-              size="large"
             />
           </Box>
         )}
       </Container>
+
+      {/* Date Selection Dialog */}
+      <Dialog
+        open={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Select Rental Dates</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Please select your rental start and end dates for {selectedEquipment?.name}
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <DatePicker
+                  label="Start Date"
+                  value={startDate}
+                  onChange={(newValue) => setStartDate(newValue)}
+                  minDate={new Date()}
+                  slotProps={{ textField: { fullWidth: true } }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <DatePicker
+                  label="End Date"
+                  value={endDate}
+                  onChange={(newValue) => setEndDate(newValue)}
+                  minDate={startDate || new Date()}
+                  slotProps={{ textField: { fullWidth: true } }}
+                />
+              </Grid>
+            </Grid>
+
+            {startDate && endDate && (
+              <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
+                <Typography variant="body2">
+                  Duration: {Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1} days
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setShowDatePicker(false);
+            setStartDate(null);
+            setEndDate(null);
+          }}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={() => {
+              if (startDate && endDate) {
+                handleDateSelect(startDate, endDate);
+              }
+            }} 
+            variant="contained"
+            disabled={!startDate || !endDate}
+          >
+            Add to Basket
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Layout>
   );
 } 

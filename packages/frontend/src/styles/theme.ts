@@ -32,10 +32,10 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: [
+      'Roboto',
       '-apple-system',
       'BlinkMacSystemFont',
       '"Segoe UI"',
-      'Roboto',
       '"Helvetica Neue"',
       'Arial',
       'sans-serif',
@@ -44,28 +44,60 @@ const theme = createTheme({
       '"Segoe UI Symbol"',
     ].join(','),
     h1: {
-      fontWeight: 500,
+      fontWeight: 300,
       fontSize: '2.5rem',
+      letterSpacing: '-0.01562em',
     },
     h2: {
-      fontWeight: 500,
+      fontWeight: 300,
       fontSize: '2rem',
+      letterSpacing: '-0.00833em',
     },
     h3: {
-      fontWeight: 500,
+      fontWeight: 400,
       fontSize: '1.75rem',
+      letterSpacing: '0em',
     },
     h4: {
-      fontWeight: 500,
+      fontWeight: 400,
       fontSize: '1.5rem',
+      letterSpacing: '0.00735em',
     },
     h5: {
-      fontWeight: 500,
+      fontWeight: 400,
       fontSize: '1.25rem',
+      letterSpacing: '0em',
     },
     h6: {
       fontWeight: 500,
       fontSize: '1rem',
+      letterSpacing: '0.0075em',
+    },
+    subtitle1: {
+      fontSize: '1rem',
+      fontWeight: 400,
+      letterSpacing: '0.00938em',
+    },
+    subtitle2: {
+      fontSize: '0.875rem',
+      fontWeight: 500,
+      letterSpacing: '0.00714em',
+    },
+    body1: {
+      fontSize: '1rem',
+      fontWeight: 400,
+      letterSpacing: '0.00938em',
+    },
+    body2: {
+      fontSize: '0.875rem',
+      fontWeight: 400,
+      letterSpacing: '0.01071em',
+    },
+    button: {
+      fontSize: '0.875rem',
+      fontWeight: 500,
+      letterSpacing: '0.02857em',
+      textTransform: 'none',
     },
   },
   shape: {
@@ -77,6 +109,7 @@ const theme = createTheme({
         root: {
           textTransform: 'none',
           fontWeight: 500,
+          letterSpacing: '0.02857em',
         },
         sizeLarge: {
           padding: '12px 24px',

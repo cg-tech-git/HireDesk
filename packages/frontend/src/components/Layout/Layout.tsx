@@ -181,6 +181,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         sx={{
           width: { sm: `calc(100% - ${open ? drawerWidth : drawerWidthCollapsed}px)` },
           ml: { sm: `${open ? drawerWidth : drawerWidthCollapsed}px` },
+          backgroundColor: 'white',
+          color: 'black',
+          boxShadow: 'none',
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -198,7 +201,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuIcon />
           </IconButton>
           
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography 
+            variant="h6" 
+            noWrap 
+            component="div" 
+            sx={{ 
+              flexGrow: 1,
+              fontSize: '1.3rem',
+              fontWeight: 600,
+            }}
+          >
             HireDesk
           </Typography>
 
@@ -345,7 +357,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          pl: 3,
+          pr: 3,
+          pb: 3,
+          pt: 0,
           width: { sm: `calc(100% - ${open ? drawerWidth : drawerWidthCollapsed}px)` },
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,

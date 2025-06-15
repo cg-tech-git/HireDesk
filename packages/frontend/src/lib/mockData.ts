@@ -318,7 +318,7 @@ export const mockQuotes: QuoteWithItems[] = [
 // Mock user for demo
 export const mockUser = {
   id: 'demo-user',
-  email: 'demo@hiredesk.com',
+  email: 'demo@allaithprojects.com',
   displayName: 'Demo User',
   role: UserRole.CUSTOMER,
   company: 'Demo Construction Ltd',
@@ -329,50 +329,110 @@ export const mockUser = {
 export const mockBrands = [
   {
     id: '1',
-    name: 'Caterpillar',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Caterpillar_logo.svg/200px-Caterpillar_logo.svg.png',
-    description: 'World leader in construction equipment',
+    name: 'Genie',
+    logo: '/images/brands/genie_logo.png',
+    description: 'World leader in construction equipment'
   },
   {
     id: '2',
-    name: 'JCB',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/JCB_logo.svg/200px-JCB_logo.svg.png',
-    description: 'British manufacturer of equipment for construction',
-  },
-  {
-    id: '3',
-    name: 'Komatsu',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Komatsu_company_logos.svg/200px-Komatsu_company_logos.svg.png',
-    description: 'Japanese construction equipment manufacturer',
+    name: 'JLG',
+    logo: '/images/brands/jlg_logo.png',
+    description: 'British manufacturer of equipment for construction'
   },
   {
     id: '4',
-    name: 'Volvo CE',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Volvo_Construction_Equipment_logo.svg/200px-Volvo_Construction_Equipment_logo.svg.png',
-    description: 'Swedish manufacturer of construction equipment',
+    name: 'Snorkel',
+    logo: '/images/brands/snorkel_logo.png',
+    description: 'Swedish manufacturer of construction equipment'
+  },
+  {
+    id: '3',
+    name: 'Niftylift',
+    logo: '/images/brands/niftylift_new_logo.png',
+    description: 'Japanese construction equipment manufacturer'
   },
   {
     id: '5',
-    name: 'Manitou',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Manitou_Group_logo.svg/200px-Manitou_Group_logo.svg.png',
-    description: 'French manufacturer of handling equipment',
+    name: 'JCB',
+    logo: '/images/brands/jcb_new_logo.png',
+    description: 'British manufacturer of equipment for construction'
   },
   {
-    id: '6',
-    name: 'Atlas Copco',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Atlas_Copco_logo.svg/200px-Atlas_Copco_logo.svg.png',
-    description: 'Swedish provider of industrial tools and equipment',
-  },
-  {
-    id: '7',
-    name: 'Cummins',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Cummins_logo.svg/200px-Cummins_logo.svg.png',
-    description: 'American manufacturer of diesel engines',
+    id: '9',
+    name: 'Club Car',
+    logo: '/images/brands/clubcar_new_logo.png',
+    description: 'World leader in golf cars and utility vehicles'
   },
   {
     id: '8',
-    name: 'Liebherr',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Liebherr_Logo.svg/200px-Liebherr_Logo.svg.png',
-    description: 'Swiss-German equipment manufacturer',
+    name: 'EZGO',
+    logo: '/images/brands/ezgo_new_logo.png',
+    description: 'American manufacturer of golf carts and utility vehicles'
+  },
+  {
+    id: '7',
+    name: 'Kawasaki',
+    logo: '/images/brands/kawasaki_logo.png',
+    description: 'Japanese manufacturer of motorcycles and ATVs'
+  },
+  {
+    id: '6',
+    name: 'Polaris',
+    logo: '/images/brands/polaris_new_logo.png',
+    description: 'American manufacturer of ATVs and side-by-sides'
+  },
+  {
+    id: '10',
+    name: 'Sogeco',
+    logo: '/images/brands/sogeco_new_logo.png',
+    description: 'Portable sanitation and hygiene solutions'
+  },
+  {
+    id: '11',
+    name: 'Flexiloo',
+    logo: '/images/brands/flexiloo_new_logo.png',
+    description: 'Innovative portable toilet solutions'
+  },
+  {
+    id: '12',
+    name: 'Trime',
+    logo: '/images/brands/trime_logo.png',
+    description: 'Construction equipment manufacturer'
+  },
+  {
+    id: '13',
+    name: 'Peri',
+    logo: '/images/brands/peri_logo.png',
+    description: 'Leading manufacturer of formwork and scaffolding systems'
+  },
+  {
+    id: '14',
+    name: 'Doka',
+    logo: '/images/brands/doka_logo.png',
+    description: 'Global formwork solutions provider'
+  },
+  {
+    id: '15',
+    name: 'Pelosio',
+    logo: '/images/brands/pelosio_logo.png',
+    description: 'Specialist in temporary infrastructure solutions'
+  },
+  {
+    id: '16',
+    name: 'Instant',
+    logo: '/images/brands/instant_logo.png',
+    description: 'Professional equipment solutions'
+  },
+  {
+    id: '17',
+    name: 'IPAF',
+    logo: '/images/brands/ipaf_logo.png',
+    description: 'International Powered Access Federation - safety training and certification'
+  },
+  {
+    id: '18',
+    name: 'PASMA',
+    logo: '/images/brands/pasma_logo.png',
+    description: 'Professional training and safety standards for mobile access towers'
   },
 ]; 

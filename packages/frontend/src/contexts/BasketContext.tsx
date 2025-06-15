@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Equipment } from '@hiredesk/shared';
+import { Equipment, EquipmentWithRelations } from '@hiredesk/shared';
 import toast from 'react-hot-toast';
 
 export interface BasketItem {
-  equipment: Equipment;
+  equipment: EquipmentWithRelations;
   startDate: string;
   endDate: string;
   duration: number;
@@ -12,7 +12,7 @@ export interface BasketItem {
 
 interface BasketContextType {
   items: BasketItem[];
-  addItem: (equipment: Equipment, startDate: string, endDate: string) => void;
+  addItem: (equipment: EquipmentWithRelations, startDate: string, endDate: string) => void;
   removeItem: (equipmentId: string) => void;
   updateItemDates: (equipmentId: string, startDate: string, endDate: string) => void;
   clearBasket: () => void;
@@ -22,7 +22,7 @@ interface BasketContextType {
 
 const BasketContext = createContext<BasketContextType | undefined>(undefined);
 
-const BASKET_STORAGE_KEY = 'hiredesk_basket';
+const BASKET_STORAGE_KEY = 'allaith_basket';
 
 export const BasketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<BasketItem[]>([]);
@@ -60,7 +60,7 @@ export const BasketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return diffInDays;
   };
 
-  const addItem = (equipment: Equipment, startDate: string, endDate: string) => {
+  const addItem = (equipment: EquipmentWithRelations, startDate: string, endDate: string) => {
     // Check if item already exists
     const existingItem = items.find(item => item.equipment.id === equipment.id);
     if (existingItem) {

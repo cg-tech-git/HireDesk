@@ -1,6 +1,11 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { auth } from './firebase';
 import toast from 'react-hot-toast';
+
+// Extend the request config to include our custom _retry property
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 class ApiClient {
   private client: AxiosInstance;
@@ -16,10 +21,16 @@ class ApiClient {
     // Request interceptor to add auth token
     this.client.interceptors.request.use(
       async (config) => {
-        const user = auth.currentUser;
-        if (user) {
-          const token = await user.getIdToken();
-          config.headers.Authorization = `Bearer ${token}`;
+        try {
+          if (auth) {
+            const user = auth.currentUser;
+            if (user) {
+              const token = await user.getIdToken();
+              config.headers.Authorization = `Bearer ${token}`;
+            }
+          }
+        } catch (error) {
+          console.error('Error getting auth token:', error);
         }
         return config;
       },
@@ -32,18 +43,21 @@ class ApiClient {
     this.client.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
-        if (error.response?.status === 401) {
-          // Token might be expired, try to refresh
-          const user = auth.currentUser;
-          if (user) {
-            try {
-              await user.getIdToken(true); // Force refresh
-              // Retry the original request
-              return this.client.request(error.config!);
-            } catch (refreshError) {
-              // Refresh failed, redirect to login
-              window.location.href = '/login';
+        const originalRequest = error.config as CustomAxiosRequestConfig;
+        
+        // Retry with new token if 401
+        if (error.response?.status === 401 && originalRequest && !originalRequest._retry && auth) {
+          originalRequest._retry = true;
+          
+          try {
+            const user = auth.currentUser;
+            if (user) {
+              const token = await user.getIdToken(true); // Force refresh
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return this.client.request(originalRequest);
             }
+          } catch (refreshError) {
+            console.error('Error refreshing token:', refreshError);
           }
         }
 

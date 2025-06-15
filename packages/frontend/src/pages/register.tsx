@@ -34,6 +34,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -45,8 +46,14 @@ export default function RegisterPage() {
   const password = watch('password');
 
   const onSubmit = async (data: RegisterFormData) => {
+    if (!auth) {
+      setError('Authentication is not available. Please try again later.');
+      return;
+    }
+
     try {
       setError(null);
+      setIsLoading(true);
 
       // Create Firebase user
       const userCredential = await createUserWithEmailAndPassword(
@@ -76,6 +83,8 @@ export default function RegisterPage() {
       } else {
         setError(err.message || 'Failed to register. Please try again.');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -223,10 +232,10 @@ export default function RegisterPage() {
               type="submit"
               fullWidth
               variant="contained"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoading}
               sx={{ mb: 2 }}
             >
-              {isSubmitting ? 'Creating Account...' : 'Register'}
+              {isLoading ? 'Creating Account...' : 'Register'}
             </Button>
 
             <Box sx={{ textAlign: 'center' }}>

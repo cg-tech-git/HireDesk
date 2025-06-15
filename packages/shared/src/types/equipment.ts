@@ -48,4 +48,14 @@ export enum ServiceType {
   INSURANCE = 'insurance',
   OPERATOR = 'operator',
   OTHER = 'other',
+}
+
+// Extended types with relations for API responses
+export interface EquipmentWithRelations extends Equipment {
+  category?: Category;
+  rateCards?: RateCard[];
+}
+
+export interface EquipmentWithCategory extends Equipment {
+  category: Category;
 } 

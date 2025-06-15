@@ -22,6 +22,21 @@ export default class MyDocument extends Document<MyDocumentProps> {
           {/* PWA primary color */}
           <meta name="theme-color" content="#1976d2" />
           <link rel="shortcut icon" href="/favicon.ico" />
+          
+          {/* Google Fonts - Roboto */}
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+            rel="stylesheet"
+          />
+          
+          {/* Material Icons */}
+          <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+          />
+          
           <meta name="emotion-insertion-point" content="" />
           {this.props.emotionStyleTags}
         </Head>
@@ -69,4 +84,4 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
     ...initialProps,
     emotionStyleTags,
   };
-}; 
+};

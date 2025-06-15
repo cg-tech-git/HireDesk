@@ -1,6 +1,7 @@
 import { api, apiEndpoints } from '@/lib/api';
 import { 
   Equipment, 
+  EquipmentWithRelations,
   Category, 
   RateCard,
   PaginatedResponse,
@@ -19,15 +20,15 @@ export const equipmentService = {
     search?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
-  }): Promise<PaginatedResponse<Equipment>> {
+  }): Promise<PaginatedResponse<EquipmentWithRelations>> {
     try {
-      const response = await api.get<ApiResponse<Equipment[]>>(apiEndpoints.equipment.list, { params });
+      const response = await api.get<ApiResponse<PaginatedResponse<EquipmentWithRelations>>>(apiEndpoints.equipment.list, { params });
       
-      if (!response.data.success) {
+      if (!response.data.success || !response.data.data) {
         throw new Error(response.data.error?.message || 'Failed to fetch equipment');
       }
       
-      return response.data as any;
+      return response.data.data;
     } catch (error) {
       if (DEMO_MODE) {
         // Use mock data in demo mode
@@ -53,8 +54,14 @@ export const equipmentService = {
         const start = (page - 1) * limit;
         const paginatedData = filteredEquipment.slice(start, start + limit);
         
+        // Add category data to mock equipment
+        const dataWithCategory = paginatedData.map(equipment => ({
+          ...equipment,
+          category: mockCategories.find(c => c.id === equipment.categoryId)
+        }));
+        
         return {
-          data: paginatedData,
+          data: dataWithCategory as EquipmentWithRelations[],
           pagination: {
             page,
             limit,
@@ -67,9 +74,9 @@ export const equipmentService = {
     }
   },
 
-  async getEquipmentById(id: string): Promise<Equipment> {
+  async getEquipmentById(id: string): Promise<EquipmentWithRelations> {
     try {
-      const response = await api.get<ApiResponse<Equipment>>(apiEndpoints.equipment.get(id));
+      const response = await api.get<ApiResponse<EquipmentWithRelations>>(apiEndpoints.equipment.get(id));
       
       if (!response.data.success || !response.data.data) {
         throw new Error(response.data.error?.message || 'Failed to fetch equipment');
@@ -80,7 +87,11 @@ export const equipmentService = {
       if (DEMO_MODE) {
         const equipment = mockEquipment.find(e => e.id === id);
         if (equipment) {
-          return equipment;
+          return {
+            ...equipment,
+            category: mockCategories.find(c => c.id === equipment.categoryId),
+            rateCards: mockRateCards.get(equipment.id) || []
+          };
         }
         throw new Error('Equipment not found');
       }

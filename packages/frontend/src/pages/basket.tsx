@@ -130,19 +130,12 @@ export default function BasketPage() {
             }}
           >
             <ShoppingCartIcon sx={{ fontSize: 100, color: 'grey.400', mb: 2 }} />
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h6" gutterBottom>
               Your basket is empty
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography color="text.secondary" sx={{ mb: 3 }}>
               Add equipment to your basket to create a quote request
             </Typography>
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => router.push('/equipment')}
-            >
-              Browse Equipment
-            </Button>
           </Box>
         </Container>
       </Layout>
@@ -243,19 +236,11 @@ export default function BasketPage() {
                 <Stack spacing={2}>
                   <Button
                     variant="contained"
-                    size="large"
                     fullWidth
                     onClick={handleSubmitQuote}
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? 'Submitting...' : 'Submit Quote Request'}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    onClick={() => router.push('/equipment')}
-                  >
-                    Continue Shopping
                   </Button>
                   <Button
                     variant="text"

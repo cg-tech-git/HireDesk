@@ -25,6 +25,11 @@ const theme = createTheme({
     success: {
       main: '#4caf50',
     },
+    text: {
+      primary: '#1e293b', // slate-800
+      secondary: '#475569', // slate-600
+      disabled: '#94a3b8', // slate-400
+    },
     background: {
       default: '#f5f5f5',
       paper: '#ffffff',
@@ -140,6 +145,8 @@ const theme = createTheme({
       styleOverrides: {
         paper: {
           boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+          borderRight: '0px solid transparent',
+          borderLeft: '0px solid transparent',
         },
       },
     },

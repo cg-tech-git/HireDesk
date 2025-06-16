@@ -82,4 +82,11 @@ logs/
 .parcel-cache/
 
 # Generated files
-generated/ 
+generated/
+
+# Local Netlify folder
+.netlify
+
+# Images folder (too large for git)
+packages/frontend/public/images/brands/
+packages/frontend/public/images/equipment/ 

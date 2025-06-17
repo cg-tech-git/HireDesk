@@ -11,12 +11,43 @@ import { AppDataSource } from '../config/database';
 
 const logger = createLogger('auth-controller');
 
+// Mock user for demo mode
+const DEMO_USER = {
+  id: '1',
+  email: 'demo@example.com',
+  name: 'Demo User',
+  role: 'user',
+  profile: {
+    company: 'Demo Company',
+    phone: '+1234567890',
+    address: {
+      street: '123 Demo St',
+      city: 'Demo City',
+      postalCode: '12345',
+      country: 'Demo Country',
+    },
+  },
+};
+
 export class AuthController {
   static async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Validate request body
       const validatedData = registerSchema.parse(req.body);
       
+      if (process.env.DEMO_MODE === 'true') {
+        logger.info('Demo mode: Returning mock registration response');
+        res.status(201).json({
+          success: true,
+          data: {
+            ...DEMO_USER,
+            firebaseUid: 'demo-firebase-uid',
+          },
+          message: 'Demo registration successful',
+        });
+        return;
+      }
+
       // Check if user already exists
       const existingUser = await User.findOne({
         where: { email: validatedData.email }
@@ -98,6 +129,19 @@ export class AuthController {
       // Validate request body
       const validatedData = loginSchema.parse(req.body);
 
+      if (process.env.DEMO_MODE === 'true') {
+        logger.info('Demo mode: Returning mock login response');
+        res.json({
+          success: true,
+          data: {
+            user: DEMO_USER,
+            customToken: 'demo-custom-token',
+          },
+          message: 'Demo login successful',
+        });
+        return;
+      }
+
       // Find user
       const user = await User.findOne({
         where: { email: validatedData.email },
@@ -142,6 +186,15 @@ export class AuthController {
   }
 
   static async getProfile(req: Request, res: Response): Promise<void> {
+    if (process.env.DEMO_MODE === 'true') {
+      logger.info('Demo mode: Returning mock profile');
+      res.json({
+        success: true,
+        data: DEMO_USER,
+      });
+      return;
+    }
+
     const userId = req.user!.id;
 
     const user = await User.findOne({

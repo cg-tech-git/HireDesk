@@ -17,8 +17,16 @@ import quoteRoutes from './routes/quotes.routes';
 export function createApp(): Express {
   const app = express();
 
-  // Initialize Firebase
-  initializeFirebase();
+  // Initialize Firebase only if not in demo mode
+  if (!process.env.DEMO_MODE) {
+    try {
+      initializeFirebase();
+    } catch (error) {
+      logger.warn('Firebase initialization failed, running in demo mode');
+    }
+  } else {
+    logger.info('Running in demo mode - Firebase initialization skipped');
+  }
 
   // Security middleware
   app.use(helmet());

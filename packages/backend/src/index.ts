@@ -15,14 +15,23 @@ const PORT = process.env.PORT || 3001;
 async function startServer() {
   try {
     // Try to initialize database but don't fail if it's not available
-    logger.info('Initializing database connection...');
-    await initializeDatabase();
+    if (!process.env.DEMO_MODE) {
+      logger.info('Initializing database connection...');
+      try {
+        await initializeDatabase();
+      } catch (error) {
+        logger.warn('Database initialization failed, running in demo mode');
+      }
+    } else {
+      logger.info('Running in demo mode - Database initialization skipped');
+    }
     
     const app = createApp();
 
     const server = app.listen(PORT, () => {
       logger.info(`Server is running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`Mode: ${process.env.DEMO_MODE ? 'Demo' : 'Normal'}`);
       
       // Log available endpoints
       logger.info('Available endpoints:');

@@ -6,6 +6,14 @@ import { User } from '../entities/User';
 
 const logger = createLogger('auth-middleware');
 
+// Demo user for demo mode
+const DEMO_USER = {
+  id: '1',
+  email: 'demo@example.com',
+  role: 'user' as UserRole,
+  firebaseUid: 'demo-firebase-uid',
+};
+
 // Extend Express Request type to include user
 declare global {
   namespace Express {
@@ -26,6 +34,14 @@ export async function authenticate(
   next: NextFunction
 ): Promise<void> {
   try {
+    // In demo mode, always authenticate as demo user
+    if (process.env.DEMO_MODE === 'true') {
+      logger.info('Demo mode: Using demo user authentication');
+      req.user = DEMO_USER;
+      next();
+      return;
+    }
+
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

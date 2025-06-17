@@ -12,6 +12,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { BasketProvider } from '@/contexts/BasketContext';
 import createEmotionCache from '@/lib/createEmotionCache';
 import theme from '@/styles/theme';
+import { ReduxProvider } from '@/components/Providers/ReduxProvider';
+import '@/styles/globals.css';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -44,7 +46,9 @@ export default function MyApp(props: MyAppProps) {
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <BasketProvider>
-                <Component {...pageProps} />
+                <ReduxProvider>
+                  <Component {...pageProps} />
+                </ReduxProvider>
                 <Toaster
                   position="top-right"
                   toastOptions={{

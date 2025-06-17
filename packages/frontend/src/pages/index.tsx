@@ -171,7 +171,11 @@ export default function HomePage() {
                     },
                   }}
                   onClick={() => {
-                    toast.success('Equipment catalog is currently unavailable');
+                    if (index === 0) {
+                      router.push('/aerial-work-platforms');
+                    } else {
+                      toast.success('Equipment catalog is currently unavailable');
+                    }
                   }}
                 >
                   <Box

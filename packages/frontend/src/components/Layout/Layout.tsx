@@ -21,27 +21,31 @@ import {
   useMediaQuery,
   Popover,
   Paper,
+  Button,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
-  Dashboard as DashboardIcon,
-  Description as DescriptionIcon,
-  RequestQuote as RequestQuoteIcon,
-  People as PeopleIcon,
-  Settings as SettingsIcon,
-  Logout as LogoutIcon,
-  Assignment as AssignmentIcon,
-  AdminPanelSettings as AdminIcon,
-  ShoppingCart as ShoppingCartIcon,
-  BuildCircle as BuildCircleIcon,
+  DashboardOutlined as DashboardIcon,
+  DescriptionOutlined as DescriptionIcon,
+  RequestQuoteOutlined as RequestQuoteIcon,
+  PeopleOutlined as PeopleIcon,
+  SettingsOutlined as SettingsIcon,
+  LogoutOutlined as LogoutIcon,
+  AssignmentOutlined as AssignmentIcon,
+  AdminPanelSettingsOutlined as AdminIcon,
+  ShoppingCartOutlined as ShoppingCartIcon,
+  BuildOutlined as BuildCircleIcon,
   ChevronRight as ChevronRightIcon,
+  EngineeringOutlined as EngineeringIcon,
+  AddHomeWorkOutlined as AddHomeWorkIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBasket } from '@/contexts/BasketContext';
 import { UserRole } from '@hiredesk/shared';
 import Badge from '@mui/material/Badge';
 import { toast } from 'react-hot-toast';
+import { colors } from '@/styles/colors';
 
 const drawerWidth = 280;
 const drawerWidthCollapsed = 64;
@@ -130,8 +134,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
     
     // Check if it's one of the new category pages
-    if (path.startsWith('/aerial-work-platforms') ||
-        path.startsWith('/modular-cabins') ||
+    if (path.startsWith('/modular-cabins') ||
         path.startsWith('/site-mobility') ||
         path.startsWith('/site-overlay') ||
         path.startsWith('/event-infrastructure') ||
@@ -174,7 +177,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       },
       {
         text: 'Sales & Rental',
-        icon: <ShoppingCartIcon />,
+        icon: <AddHomeWorkIcon />,
         path: null,
         roles: [UserRole.CUSTOMER, UserRole.HIRE_DESK, UserRole.ADMIN],
         children: [
@@ -202,7 +205,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       },
       {
         text: 'EPC',
-        icon: <BuildCircleIcon />,
+        icon: <EngineeringIcon />,
         path: null,
         roles: [UserRole.CUSTOMER, UserRole.HIRE_DESK, UserRole.ADMIN],
         children: [
@@ -283,7 +286,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           width: { sm: `calc(100% - ${open ? drawerWidth : drawerWidthCollapsed}px)` },
           ml: { sm: `${open ? drawerWidth : drawerWidthCollapsed}px` },
           backgroundColor: 'white',
-          color: 'black',
+          color: colors.gemini.text,
           boxShadow: 'none',
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
@@ -300,33 +303,55 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               flexGrow: 1,
               fontSize: '1.3rem',
               fontWeight: 600,
+              color: colors.gemini.text,
             }}
           >
             HireDesk
           </Typography>
 
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {/* Basket Icon in Header */}
-            {userProfile?.role === UserRole.CUSTOMER && (
-              <IconButton
-                color="inherit"
-                onClick={() => handleNavigation('/basket')}
-                sx={{ mr: 2 }}
-              >
-                <Badge badgeContent={getItemCount()} color="error">
-                  <ShoppingCartIcon />
-                </Badge>
-              </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {!userProfile ? (
+              <>
+                <Button
+                  variant="outlined"
+                  onClick={() => router.push('/login')}
+                  sx={{
+                    borderColor: '#155799',
+                    color: '#155799',
+                    '&:hover': {
+                      borderColor: '#159957',
+                      backgroundColor: 'rgba(21, 153, 87, 0.04)',
+                    },
+                  }}
+                >
+                  Login
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => router.push('/register')}
+                  sx={{
+                    background: 'linear-gradient(to right, #155799, #159957)',
+                    color: 'white',
+                    '&:hover': {
+                      background: 'linear-gradient(to right, #1a6ab8, #1ab86a)',
+                    },
+                  }}
+                >
+                  Register
+                </Button>
+              </>
+            ) : (
+              <>
+                <Typography variant="body2" sx={{ mr: 2 }}>
+                  {userProfile?.name}
+                </Typography>
+                <IconButton onClick={handleUserMenuOpen} size="small">
+                  <Avatar sx={{ width: 32, height: 32 }}>
+                    {userProfile?.name?.charAt(0).toUpperCase()}
+                  </Avatar>
+                </IconButton>
+              </>
             )}
-
-            <Typography variant="body2" sx={{ mr: 2 }}>
-              {userProfile?.name}
-            </Typography>
-            <IconButton onClick={handleUserMenuOpen} size="small">
-              <Avatar sx={{ width: 32, height: 32 }}>
-                {userProfile?.name?.charAt(0).toUpperCase()}
-              </Avatar>
-            </IconButton>
           </Box>
 
           <Menu
@@ -372,11 +397,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               duration: theme.transitions.duration.enteringScreen,
             }),
             overflowX: 'hidden',
-            backgroundColor: '#f8fafc',
+            backgroundColor: colors.gemini.background,
             borderRight: '0px solid transparent !important',
             boxShadow: 'none',
             '&:hover': {
-              backgroundColor: '#f8fafc',
+              backgroundColor: colors.gemini.background,
             },
           },
         }}
@@ -411,7 +436,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         mx: open ? 2 : 1,
                         borderRadius: '24px',
                         '&.Mui-selected': {
-                          backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                          backgroundColor: colors.blue[50],
                         },
                         '&:hover': {
                           backgroundColor: 'rgba(0, 0, 0, 0.04)',
@@ -423,7 +448,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         sx={{ 
                           minWidth: open ? 56 : 'auto',
                           justifyContent: 'center',
-                          color: currentSubMenuItem === item.text ? 'primary.main' : 'inherit',
+                          color: currentSubMenuItem === item.text ? colors.blue[600] : colors.gemini.textSecondary,
                         }}
                       >
                         {item.icon}
@@ -433,12 +458,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                           <ListItemText 
                             primary={item.text}
                             sx={{
-                              color: currentSubMenuItem === item.text ? 'primary.main' : 'inherit',
+                              color: currentSubMenuItem === item.text ? colors.blue[600] : colors.gemini.text,
+                              '& .MuiTypography-root': {
+                                fontWeight: currentSubMenuItem === item.text ? 500 : 400,
+                              },
                             }}
                           />
                           <ChevronRightIcon 
                             sx={{
-                              color: currentSubMenuItem === item.text ? 'primary.main' : 'inherit',
+                              color: currentSubMenuItem === item.text ? colors.blue[600] : colors.gemini.textSecondary,
                             }}
                           />
                         </>
@@ -504,7 +532,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                           >
                             <ListItemIcon 
                               sx={{
-                                color: router.pathname === child.path ? 'primary.main' : 'inherit',
+                                color: router.pathname === child.path ? colors.blue[600] : colors.gemini.textSecondary,
                               }}
                             >
                               {child.icon}
@@ -512,7 +540,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <ListItemText 
                               primary={child.text}
                               sx={{
-                                color: router.pathname === child.path ? 'primary.main' : 'inherit',
+                                color: router.pathname === child.path ? colors.blue[600] : colors.gemini.text,
+                                '& .MuiTypography-root': {
+                                  fontWeight: router.pathname === child.path ? 500 : 400,
+                                },
                               }}
                             />
                           </ListItemButton>
@@ -530,7 +561,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       mx: open ? 2 : 1,
                       borderRadius: '24px',
                       '&.Mui-selected': {
-                        backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                        backgroundColor: colors.blue[50],
                       },
                       '&:hover': {
                         backgroundColor: 'rgba(0, 0, 0, 0.04)',
@@ -542,7 +573,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       sx={{ 
                         minWidth: open ? 56 : 'auto',
                         justifyContent: 'center',
-                        color: router.pathname === item.path ? 'primary.main' : 'inherit',
+                        color: router.pathname === item.path ? colors.blue[600] : colors.gemini.textSecondary,
                       }}
                     >
                       {item.icon}
@@ -551,7 +582,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       <ListItemText 
                         primary={item.text}
                         sx={{
-                          color: router.pathname === item.path ? 'primary.main' : 'inherit',
+                          color: router.pathname === item.path ? colors.blue[600] : colors.gemini.text,
+                          '& .MuiTypography-root': {
+                            fontWeight: router.pathname === item.path ? 500 : 400,
+                          },
                         }}
                       />
                     )}
@@ -573,11 +607,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 mx: open ? 2 : 1,
                 borderRadius: '24px',
                 '&.Mui-selected': {
-                  backgroundColor: 'rgba(25, 118, 210, 0.08)',
-                },
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                  borderRadius: '24px',
+                  backgroundColor: colors.blue[50],
                 },
               }}
             >
@@ -585,7 +615,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 sx={{ 
                   minWidth: open ? 56 : 'auto',
                   justifyContent: 'center',
-                  color: router.pathname === '/settings' ? 'primary.main' : 'inherit',
+                  color: router.pathname === '/settings' ? colors.blue[600] : colors.gemini.textSecondary,
                 }}
               >
                 <SettingsIcon />
@@ -594,7 +624,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <ListItemText 
                   primary="Settings"
                   sx={{
-                    color: router.pathname === '/settings' ? 'primary.main' : 'inherit',
+                    color: router.pathname === '/settings' ? colors.blue[600] : colors.gemini.text,
+                    '& .MuiTypography-root': {
+                      fontWeight: router.pathname === '/settings' ? 500 : 400,
+                    },
                   }}
                 />
               )}

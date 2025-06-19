@@ -22,6 +22,7 @@ import {
   Popover,
   Paper,
   Button,
+  Tooltip,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -39,6 +40,14 @@ import {
   ChevronRight as ChevronRightIcon,
   EngineeringOutlined as EngineeringIcon,
   AddHomeWorkOutlined as AddHomeWorkIcon,
+  PaletteOutlined as PaletteIcon,
+  PolicyOutlined as PolicyIcon,
+  GavelOutlined as GavelIcon,
+  ArticleOutlined as ArticleIcon,
+  HelpOutlineOutlined as HelpIcon,
+  FeedbackOutlined as FeedbackIcon,
+  PersonOutlineOutlined as PersonIcon,
+  EmailOutlined as EmailIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBasket } from '@/contexts/BasketContext';
@@ -46,6 +55,10 @@ import { UserRole } from '@hiredesk/shared';
 import Badge from '@mui/material/Badge';
 import { toast } from 'react-hot-toast';
 import { colors } from '@/styles/colors';
+import { FloatingQuoteCart } from '@/components/QuoteCart/FloatingQuoteCart';
+import { QuoteManager } from '@/components/QuoteCart/QuoteManager';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 const drawerWidth = 280;
 const drawerWidthCollapsed = 64;
@@ -60,15 +73,45 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { userProfile, logout } = useAuth();
   const { getItemCount } = useBasket();
+  const quoteItems = useSelector((state: RootState) => state.quote.items);
+  const hasQuoteItems = quoteItems.length > 0;
   
   const [isHovered, setIsHovered] = useState(false);
   const [open, setOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [userMenuAnchor, setUserMenuAnchor] = React.useState<null | HTMLElement>(null);
+  const [settingsMenuAnchor, setSettingsMenuAnchor] = React.useState<null | HTMLElement>(null);
   const [expandedMenus, setExpandedMenus] = useState<{ [key: string]: boolean }>({});
-  const [subMenuAnchor, setSubMenuAnchor] = useState<{
+  const [subMenuAnchor, setSubMenuAnchor] = React.useState<{
     element: HTMLElement | null;
     item: string | null;
-  }>({ element: null, item: null });
+  }>({ 
+    element: null, 
+    item: null 
+  });
+  const mainContentRef = React.useRef<HTMLElement>(null);
+
+  // Scroll to top when pathname changes
+  React.useEffect(() => {
+    // Scroll window
+    window.scrollTo(0, 0);
+    
+    // Scroll document
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    // Scroll main content if it exists
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+    }
+    
+    // Force scroll on all scrollable elements
+    const scrollableElements = document.querySelectorAll('*');
+    scrollableElements.forEach((el) => {
+      if (el.scrollHeight > el.clientHeight) {
+        el.scrollTop = 0;
+      }
+    });
+  }, [router.pathname]);
 
   // Update open state based on hover and mobile status
   useEffect(() => {
@@ -107,11 +150,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+    setUserMenuAnchor(event.currentTarget);
   };
 
   const handleUserMenuClose = () => {
-    setAnchorEl(null);
+    setUserMenuAnchor(null);
+  };
+
+  const handleSettingsMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setSettingsMenuAnchor(event.currentTarget);
+  };
+
+  const handleSettingsMenuClose = () => {
+    setSettingsMenuAnchor(null);
   };
 
   const handleLogout = async () => {
@@ -165,6 +216,92 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const isSubMenuOpen = Boolean(subMenuAnchor.element);
   const currentSubMenuItem = subMenuAnchor.item;
+
+  const menuItems = [
+    { 
+      value: 'Demo User',
+      icon: <PersonIcon fontSize="medium" />,
+      isDivider: false,
+      menuType: 'user'
+    },
+    { 
+      value: 'demo@example.com',
+      icon: <EmailIcon fontSize="medium" />,
+      isDivider: true,
+      menuType: 'user'
+    },
+    { 
+      label: 'Theme',
+      icon: <PaletteIcon fontSize="medium" />,
+      action: () => toast.success('Theme settings coming soon'),
+      isDivider: false,
+      menuType: 'both'
+    },
+    { 
+      label: 'Privacy Policy',
+      icon: <PolicyIcon fontSize="medium" />,
+      action: () => toast.success('Privacy Policy page coming soon'),
+      isDivider: false,
+      menuType: 'both'
+    },
+    { 
+      label: 'Terms of Service',
+      icon: <ArticleIcon fontSize="medium" />,
+      action: () => toast.success('Terms of Service page coming soon'),
+      isDivider: false,
+      menuType: 'both'
+    },
+    { 
+      label: 'Help and Support',
+      icon: <HelpIcon fontSize="medium" />,
+      action: () => toast.success('Help and Support page coming soon'),
+      isDivider: false,
+      menuType: 'both'
+    },
+    { 
+      label: 'Send Feedback',
+      icon: <FeedbackIcon fontSize="medium" />,
+      action: () => toast.success('Feedback form coming soon'),
+      isDivider: false,
+      menuType: 'both'
+    },
+  ];
+
+  const renderMenuItems = (handleClose: () => void, menuType: 'user' | 'settings') => (
+    <>
+      {menuItems
+        .filter(item => item.menuType === 'both' || item.menuType === menuType)
+        .map((item, index) => (
+          <React.Fragment key={item.value || item.label}>
+            {item.value ? (
+              <MenuItem onClick={handleClose} disabled>
+                <ListItemIcon sx={{ minWidth: 36, color: '#183057' }}>
+                  {item.icon}
+                </ListItemIcon>
+                <Typography variant="body2" sx={{ fontSize: '14px' }}>
+                  {item.value}
+                </Typography>
+              </MenuItem>
+            ) : (
+              <MenuItem 
+                onClick={() => {
+                  handleClose();
+                  item.action?.();
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 36, color: '#183057' }}>
+                  {item.icon}
+                </ListItemIcon>
+                <Typography sx={{ fontSize: '14px' }}>
+                  {item.label}
+                </Typography>
+              </MenuItem>
+            )}
+            {item.isDivider && <Divider />}
+          </React.Fragment>
+        ))}
+    </>
+  );
 
   // Navigation items based on user role
   const getNavigationItems = () => {
@@ -286,7 +423,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           width: { sm: `calc(100% - ${open ? drawerWidth : drawerWidthCollapsed}px)` },
           ml: { sm: `${open ? drawerWidth : drawerWidthCollapsed}px` },
           backgroundColor: 'white',
-          color: colors.gemini.text,
+          color: '#183057',
           boxShadow: 'none',
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
@@ -303,60 +440,71 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               flexGrow: 1,
               fontSize: '1.3rem',
               fontWeight: 600,
-              color: colors.gemini.text,
+              color: '#183057',
             }}
           >
             HireDesk
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {!userProfile ? (
-              <>
-                <Button
-                  variant="outlined"
-                  onClick={() => router.push('/login')}
-                  sx={{
-                    borderColor: '#155799',
-                    color: '#155799',
-                    '&:hover': {
-                      borderColor: '#159957',
-                      backgroundColor: 'rgba(21, 153, 87, 0.04)',
-                    },
-                  }}
-                >
-                  Login
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => router.push('/register')}
-                  sx={{
-                    background: 'linear-gradient(to right, #155799, #159957)',
-                    color: 'white',
-                    '&:hover': {
-                      background: 'linear-gradient(to right, #1a6ab8, #1ab86a)',
-                    },
-                  }}
-                >
-                  Register
-                </Button>
-              </>
-            ) : (
-              <>
-                <Typography variant="body2" sx={{ mr: 2 }}>
-                  {userProfile?.name}
-                </Typography>
-                <IconButton onClick={handleUserMenuOpen} size="small">
-                  <Avatar sx={{ width: 32, height: 32 }}>
-                    {userProfile?.name?.charAt(0).toUpperCase()}
-                  </Avatar>
-                </IconButton>
-              </>
-            )}
+            <Button
+              variant="text"
+              disabled
+              sx={{
+                color: '#183057',
+                borderRadius: '50px',
+                px: 3,
+                opacity: 0.5,
+                '&.Mui-disabled': {
+                  color: '#183057',
+                },
+              }}
+            >
+              Register
+            </Button>
+            <Button
+              variant="text"
+              disabled
+              sx={{
+                color: '#183057',
+                borderRadius: '50px',
+                px: 3,
+                opacity: 0.5,
+                '&.Mui-disabled': {
+                  color: '#183057',
+                },
+              }}
+            >
+              Login
+            </Button>
+            <IconButton
+              onClick={handleUserMenuOpen}
+              sx={{
+                opacity: 0.7,
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                },
+              }}
+            >
+              <Avatar 
+                sx={{ 
+                  width: 32, 
+                  height: 32,
+                  bgcolor: '#f5f5f5',
+                  color: '#183057',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                }}
+              >
+                HD
+              </Avatar>
+            </IconButton>
           </Box>
 
+          {/* User Menu */}
           <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
+            anchorEl={userMenuAnchor}
+            open={Boolean(userMenuAnchor)}
             onClose={handleUserMenuClose}
             anchorOrigin={{
               vertical: 'bottom',
@@ -367,15 +515,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               horizontal: 'right',
             }}
           >
-            <MenuItem onClick={() => handleNavigation('/profile')}>
-              Profile
-            </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              <ListItemIcon>
-                <LogoutIcon fontSize="small" />
-              </ListItemIcon>
-              Logout
-            </MenuItem>
+            {renderMenuItems(handleUserMenuClose, 'user')}
           </Menu>
         </Toolbar>
       </AppBar>
@@ -397,11 +537,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               duration: theme.transitions.duration.enteringScreen,
             }),
             overflowX: 'hidden',
-            backgroundColor: colors.gemini.background,
+            backgroundColor: '#f8fafc',
             borderRight: '0px solid transparent !important',
             boxShadow: 'none',
             '&:hover': {
-              backgroundColor: colors.gemini.background,
+              backgroundColor: '#f8fafc',
             },
           },
         }}
@@ -448,7 +588,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         sx={{ 
                           minWidth: open ? 56 : 'auto',
                           justifyContent: 'center',
-                          color: currentSubMenuItem === item.text ? colors.blue[600] : colors.gemini.textSecondary,
+                          color: currentSubMenuItem === item.text ? '#183057' : '#183057',
                         }}
                       >
                         {item.icon}
@@ -458,15 +598,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                           <ListItemText 
                             primary={item.text}
                             sx={{
-                              color: currentSubMenuItem === item.text ? colors.blue[600] : colors.gemini.text,
+                              color: currentSubMenuItem === item.text ? '#183057' : '#183057',
                               '& .MuiTypography-root': {
                                 fontWeight: currentSubMenuItem === item.text ? 500 : 400,
+                                fontSize: '14px',
                               },
                             }}
                           />
                           <ChevronRightIcon 
                             sx={{
-                              color: currentSubMenuItem === item.text ? colors.blue[600] : colors.gemini.textSecondary,
+                              color: currentSubMenuItem === item.text ? '#183057' : '#183057',
                             }}
                           />
                         </>
@@ -487,68 +628,56 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       sx={{
                         '& .MuiPaper-root': {
                           marginLeft: -1,
-                          borderTopLeftRadius: 0,
-                          borderBottomLeftRadius: 0,
-                          boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.1)',
+                          borderRadius: 4,
+                          boxShadow: '2px 2px 2px rgba(0, 0, 0, 0.05)',
+                          border: '1px solid #e2e8f0',
+                          backgroundColor: '#fcfcfd',
+                          width: 280,
+                          py: 1,
                         },
                       }}
-                      slotProps={{
-                        paper: {
-                          sx: {
-                            width: 280,
-                            backgroundColor: '#f8fafc',
-                          }
-                        }
-                      }}
                     >
-                      <Paper 
-                        elevation={0}
-                        sx={{ 
-                          backgroundColor: 'inherit',
-                          py: 1,
-                        }}
-                      >
-                        {item.children.map((child, childIndex) => (
-                          <ListItemButton
-                            key={childIndex}
-                            onClick={() => {
-                              handleNavigation(child.path);
-                              handleSubMenuClose();
-                            }}
-                            selected={router.pathname === child.path}
-                            sx={{ 
-                              pl: 3,
-                              minHeight: 48,
-                              mx: 2,
+                      {item.children.map((child, childIndex) => (
+                        <ListItemButton
+                          key={childIndex}
+                          onClick={() => {
+                            handleNavigation(child.path);
+                            handleSubMenuClose();
+                          }}
+                          selected={router.pathname === child.path}
+                          sx={{ 
+                            pl: 3,
+                            minHeight: 48,
+                            mx: 2,
+                            borderRadius: '24px',
+                            '&.Mui-selected': {
+                              backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                            },
+                            '&:hover': {
+                              backgroundColor: 'rgba(0, 0, 0, 0.04)',
                               borderRadius: '24px',
-                              '&.Mui-selected': {
-                                backgroundColor: 'rgba(25, 118, 210, 0.08)',
-                              },
-                              '&:hover': {
-                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                borderRadius: '24px',
-                              },
+                            },
+                          }}
+                        >
+                          <ListItemIcon 
+                            sx={{
+                              color: router.pathname === child.path ? '#183057' : '#183057',
                             }}
                           >
-                            <ListItemIcon 
-                              sx={{
-                                color: router.pathname === child.path ? colors.blue[600] : colors.gemini.textSecondary,
-                              }}
-                            >
-                              {child.icon}
-                            </ListItemIcon>
-                            <ListItemText 
-                              primary={child.text}
-                              sx={{
-                                color: router.pathname === child.path ? colors.blue[600] : colors.gemini.text,
-                                '& .MuiTypography-root': {
-                                  fontWeight: router.pathname === child.path ? 500 : 400,
-                                },
-                              }}
-                            />
-                          </ListItemButton>
-                        ))}
-                      </Paper>
+                            {child.icon}
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={child.text}
+                            sx={{
+                              color: router.pathname === child.path ? '#183057' : '#183057',
+                              '& .MuiTypography-root': {
+                                fontWeight: router.pathname === child.path ? 500 : 400,
+                                fontSize: '14px',
+                              },
+                            }}
+                          />
+                        </ListItemButton>
+                      ))}
                     </Popover>
                   </>
                 ) : (
@@ -573,7 +702,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       sx={{ 
                         minWidth: open ? 56 : 'auto',
                         justifyContent: 'center',
-                        color: router.pathname === item.path ? colors.blue[600] : colors.gemini.textSecondary,
+                        color: router.pathname === item.path ? '#183057' : '#183057',
                       }}
                     >
                       {item.icon}
@@ -582,9 +711,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       <ListItemText 
                         primary={item.text}
                         sx={{
-                          color: router.pathname === item.path ? colors.blue[600] : colors.gemini.text,
+                          color: router.pathname === item.path ? '#183057' : '#183057',
                           '& .MuiTypography-root': {
                             fontWeight: router.pathname === item.path ? 500 : 400,
+                            fontSize: '14px',
                           },
                         }}
                       />
@@ -599,8 +729,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <Box sx={{ mt: 'auto', pb: 2 }}>
             <Divider sx={{ mx: 2, mb: 2 }} />
             <ListItemButton
-              onClick={() => handleNavigation('/settings')}
-              selected={router.pathname === '/settings'}
+              onClick={handleSettingsMenuOpen}
               sx={{ 
                 justifyContent: open ? 'initial' : 'center',
                 minHeight: 48,
@@ -609,13 +738,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 '&.Mui-selected': {
                   backgroundColor: colors.blue[50],
                 },
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  borderRadius: '24px',
+                },
               }}
             >
               <ListItemIcon 
                 sx={{ 
                   minWidth: open ? 56 : 'auto',
                   justifyContent: 'center',
-                  color: router.pathname === '/settings' ? colors.blue[600] : colors.gemini.textSecondary,
+                  color: Boolean(settingsMenuAnchor) ? '#183057' : '#183057',
                 }}
               >
                 <SettingsIcon />
@@ -624,36 +757,80 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <ListItemText 
                   primary="Settings"
                   sx={{
-                    color: router.pathname === '/settings' ? colors.blue[600] : colors.gemini.text,
+                    color: Boolean(settingsMenuAnchor) ? '#183057' : '#183057',
                     '& .MuiTypography-root': {
-                      fontWeight: router.pathname === '/settings' ? 500 : 400,
+                      fontWeight: Boolean(settingsMenuAnchor) ? 500 : 400,
+                      fontSize: '14px',
                     },
                   }}
                 />
               )}
             </ListItemButton>
           </Box>
+
+          {/* Settings Menu */}
+          <Menu
+            anchorEl={settingsMenuAnchor}
+            open={Boolean(settingsMenuAnchor)}
+            onClose={handleSettingsMenuClose}
+            PaperProps={{
+              sx: {
+                marginLeft: -1,
+                borderRadius: 4,
+                boxShadow: '2px 2px 2px rgba(0, 0, 0, 0.05)',
+                width: 280,
+                backgroundColor: '#fcfcfd',
+                border: '1px solid #e2e8f0',
+                '& .MuiList-root': {
+                  py: 1,
+                },
+              },
+            }}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            sx={{
+              '& .MuiPaper-root': {
+                marginLeft: -1,
+                marginTop: '-48px',
+              },
+            }}
+          >
+            {renderMenuItems(handleSettingsMenuClose, 'settings')}
+          </Menu>
         </Box>
       </Drawer>
 
+      {/* Main Content */}
       <Box
         component="main"
+        ref={mainContentRef}
         sx={{
           flexGrow: 1,
-          pl: 3,
-          pr: 3,
+          px: 3,
           pb: 3,
           pt: 0,
           width: { sm: `calc(100% - ${open ? drawerWidth : drawerWidthCollapsed}px)` },
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
+            duration: theme.transitions.duration.enteringScreen,
           }),
         }}
       >
         <Toolbar />
         {children}
       </Box>
+      
+      {/* Floating Quote Cart - only shows when there are items */}
+      {hasQuoteItems && <FloatingQuoteCart />}
+      
+      {/* Quote Manager - handles global quote workflow */}
+      <QuoteManager />
     </Box>
   );
 }; 

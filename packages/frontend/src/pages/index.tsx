@@ -14,7 +14,6 @@ import {
   Grid,
 } from '@mui/material';
 import { Search, ArrowForward } from '@mui/icons-material';
-import { useAuth } from '@/contexts/AuthContext';
 import { Layout } from '@/components/Layout/Layout';
 import { mockBrands } from '@/lib/mockData';
 import { BrandCarousel } from '@/components/BrandCarousel/BrandCarousel';
@@ -23,7 +22,6 @@ import { toast } from 'react-hot-toast';
 
 export default function HomePage() {
   const router = useRouter();
-  const { currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
@@ -48,10 +46,11 @@ export default function HomePage() {
     <Layout>
       <Box
         sx={{
-          backgroundColor: 'white',
+          backgroundColor: '#fdfdfd',
           color: 'black',
           pb: 4,
           mx: -3, // Negative margin to counteract Layout's padding
+          px: 3,  // Add it back for content
         }}
       >
         <Container maxWidth={false} disableGutters sx={{ px: 3 }}>
@@ -63,16 +62,13 @@ export default function HomePage() {
               sx={{ 
                 fontWeight: 400,
                 fontSize: '2.2rem',
-                background: 'linear-gradient(to right, #155799, #159957)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
+                color: '#183057',
                 display: 'inline-block',
               }}
             >
               Welcome to Al Laith Projects Services
             </Typography>
-            <Typography variant="body1" sx={{ opacity: 0.7 }}>
+            <Typography variant="body1" sx={{ color: '#183057' }}>
               Search from our wide range of project equipment and event infrastucture solutions
             </Typography>
           </Box>
@@ -88,7 +84,7 @@ export default function HomePage() {
             <TextField
               fullWidth
               variant="outlined"
-              placeholder="Search for equipment (e.g., excavator, generator, forklift...)"
+              placeholder="Search for equipment ..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               sx={{
@@ -120,12 +116,12 @@ export default function HomePage() {
                     <IconButton
                       type="submit"
                       sx={{
-                        backgroundColor: 'rgba(76, 175, 80, 0.5)',  // 50% transparent light green
-                        color: 'white',
+                        backgroundColor: 'white',
+                        color: '#183057',
                         width: 40,
                         height: 40,
                         '&:hover': {
-                          backgroundColor: 'rgba(69, 160, 73, 0.5)',  // 50% transparent darker green
+                          backgroundColor: '#f5f5f5',
                         },
                       }}
                     >
@@ -139,7 +135,7 @@ export default function HomePage() {
         </Container>
       </Box>
 
-      <Box sx={{ backgroundColor: 'white', minHeight: '100vh', mx: -3 }}>
+      <Box sx={{ backgroundColor: '#fdfdfd', minHeight: '100vh', mx: -3, px: 3 }}>
         <Container maxWidth={false} disableGutters sx={{ px: 3 }}>
           {/* Brands Section */}
           <Box sx={{ py: 4, pt: 1 }}>
@@ -409,15 +405,12 @@ export default function HomePage() {
                 fontSize: '1.8rem',
                 fontWeight: 400,
                 mb: 3,
-                background: 'linear-gradient(to right, #155799, #159957)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
+                color: '#183057',
                 display: 'inline-block',
                 width: '100%',
               }}
             >
-              Industry Leading OEM Brands
+              Industry Leading OEM Equipment
             </Typography>
             <Typography 
               variant="body1" 
@@ -426,12 +419,12 @@ export default function HomePage() {
                 mb: 2,
                 mx: 'auto',
                 maxWidth: '800px',
-                color: 'text.secondary',
+                color: '#183057',
                 lineHeight: 1.6,
                 fontSize: '1rem'
               }}
             >
-              Whether you're managing a complex event or construction project, maintaining industrial sites or handling specialised installations, our project solutions are engineered to enhance productivity while prioritising safety and ease of use.
+              Together with our trusted partners, we deliver excellence in equipment solutions, ensuring your projects achieve their full potential through innovation and reliability.
             </Typography>
 
             {/* Brand Carousel (First - OEM Brands) */}
@@ -451,10 +444,7 @@ export default function HomePage() {
                 fontSize: '1.8rem',
                 fontWeight: 400,
                 mb: 3,
-                background: 'linear-gradient(to right, #155799, #159957)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
+                color: '#183057',
                 display: 'inline-block',
                 width: '100%',
               }}
@@ -468,12 +458,12 @@ export default function HomePage() {
                 mb: 2,
                 mx: 'auto',
                 maxWidth: '800px',
-                color: 'text.secondary',
+                color: '#183057',
                 lineHeight: 1.6,
                 fontSize: '1rem'
               }}
             >
-              Together with our trusted partners, we deliver excellence in equipment solutions, ensuring your projects achieve their full potential through innovation and reliability.
+              Whether you're managing a complex event or construction project, maintaining industrial sites or handling specialised installations, our project solutions are engineered to enhance productivity while prioritising safety and ease of use.
             </Typography>
           </Box>
 

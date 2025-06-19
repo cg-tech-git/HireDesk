@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import { useQuery } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 import {
   Container,
   Box,
   Typography,
-  Card,
-  CardContent,
-  Button,
-  Chip,
   Table,
   TableBody,
   TableCell,
@@ -16,210 +11,182 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Tabs,
-  Tab,
-  CircularProgress,
-  Alert,
+  IconButton,
+  Chip,
+  TablePagination,
+  Tooltip,
 } from '@mui/material';
-import { Description as DescriptionIcon, Add as AddIcon } from '@mui/icons-material';
+import {
+  PictureAsPdf as PdfIcon,
+  Download as DownloadIcon,
+} from '@mui/icons-material';
 import { Layout } from '@/components/Layout/Layout';
-import { api, apiEndpoints } from '@/lib/api';
-import { QuoteWithItems, QuoteStatus } from '@hiredesk/shared';
+import { RootState } from '@/store/store';
+import { SavedQuote } from '@/store/savedQuotesSlice';
 import { format } from 'date-fns';
-import { mockQuotes } from '@/lib/mockData';
-
-interface QuotesResponse {
-  success: boolean;
-  data: QuoteWithItems[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
-const statusColors: Record<QuoteStatus, 'default' | 'primary' | 'success' | 'error' | 'warning' | 'info'> = {
-  [QuoteStatus.DRAFT]: 'default',
-  [QuoteStatus.SUBMITTED]: 'primary',
-  [QuoteStatus.IN_REVIEW]: 'info',
-  [QuoteStatus.CONFIRMED]: 'success',
-  [QuoteStatus.REJECTED]: 'error',
-  [QuoteStatus.CANCELLED]: 'warning',
-};
-
-const statusLabels: Record<QuoteStatus, string> = {
-  [QuoteStatus.DRAFT]: 'Draft',
-  [QuoteStatus.SUBMITTED]: 'Submitted',
-  [QuoteStatus.IN_REVIEW]: 'In Review',
-  [QuoteStatus.CONFIRMED]: 'Confirmed',
-  [QuoteStatus.REJECTED]: 'Rejected',
-  [QuoteStatus.CANCELLED]: 'Cancelled',
-};
+import { openQuotePDFInNewTab, downloadQuotePDF } from '@/utils/pdf-generator';
 
 export default function QuotesPage() {
-  const router = useRouter();
-  const [statusFilter, setStatusFilter] = useState<QuoteStatus | 'all'>('all');
+  const savedQuotes = useSelector((state: RootState) => state.savedQuotes.quotes);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const { data, isLoading, error } = useQuery<QuotesResponse>({
-    queryKey: ['quotes', statusFilter],
-    queryFn: async () => {
-      try {
-        const params = statusFilter !== 'all' ? { status: statusFilter } : {};
-        const response = await api.get(apiEndpoints.quotes.myQuotes, { params });
-        return response.data;
-      } catch (error) {
-        // Use mock data in demo mode
-        const filteredQuotes = statusFilter === 'all' 
-          ? mockQuotes 
-          : mockQuotes.filter(q => q.status === statusFilter);
-        
-        return {
-          success: true,
-          data: filteredQuotes,
-          pagination: {
-            page: 1,
-            limit: 20,
-            total: filteredQuotes.length,
-            totalPages: 1,
-          },
-        };
-      }
-    },
-  });
+  const filteredQuotes = savedQuotes;
 
-  const handleViewQuote = (quoteId: string) => {
-    router.push(`/quotes/${quoteId}`);
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
   };
 
-  const handleCreateQuote = () => {
-    router.push('/basket');
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
-  const handleStatusFilterChange = (event: React.SyntheticEvent, newValue: QuoteStatus | 'all') => {
-    setStatusFilter(newValue);
+  const handleViewPDF = (quote: SavedQuote) => {
+    openQuotePDFInNewTab(quote);
   };
 
-  if (isLoading) {
-    return (
-      <Layout>
-        <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-            <CircularProgress />
-          </Box>
-        </Container>
-      </Layout>
-    );
-  }
+  const handleDownloadPDF = (quote: SavedQuote) => {
+    downloadQuotePDF(quote);
+  };
 
-  if (error) {
-    return (
-      <Layout>
-        <Container maxWidth="lg">
-          <Alert severity="error">
-            Error loading quotes. Please try again later.
-          </Alert>
-        </Container>
-      </Layout>
-    );
-  }
 
-  const quotes = data?.data || [];
+
+  const paginatedQuotes = filteredQuotes.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <Layout>
-      <Container maxWidth="lg">
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography variant="h4" component="h1">
-            My Quotes
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreateQuote}
-          >
-            Create New Quote
-          </Button>
-        </Box>
-
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs value={statusFilter} onChange={handleStatusFilterChange}>
-            <Tab label="All" value="all" />
-            <Tab label="Draft" value={QuoteStatus.DRAFT} />
-            <Tab label="Submitted" value={QuoteStatus.SUBMITTED} />
-            <Tab label="In Review" value={QuoteStatus.IN_REVIEW} />
-            <Tab label="Confirmed" value={QuoteStatus.CONFIRMED} />
-            <Tab label="Rejected" value={QuoteStatus.REJECTED} />
-          </Tabs>
-        </Box>
-
-        {quotes.length === 0 ? (
-          <Card>
-            <CardContent sx={{ textAlign: 'center', py: 8 }}>
-              <DescriptionIcon sx={{ fontSize: 80, color: 'grey.400', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                No quotes found
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                {statusFilter === 'all'
-                  ? "You haven't created any quotes yet."
-                  : `You don't have any ${statusLabels[statusFilter as QuoteStatus].toLowerCase()} quotes.`}
-              </Typography>
-              <Button variant="contained" onClick={handleCreateQuote}>
-                Create Your First Quote
-              </Button>
-            </CardContent>
-          </Card>
+      <Box sx={{ 
+        backgroundColor: '#fdfdfd', 
+        minHeight: '100vh',
+        mx: -3, // Negate Layout's horizontal padding
+        px: 3,  // Add it back for content
+      }}>
+        <Container maxWidth="lg" sx={{ pt: 6 }}>
+        {filteredQuotes.length === 0 ? (
+          <Paper sx={{ p: 6, textAlign: 'center' }}>
+            <PdfIcon sx={{ fontSize: 80, color: 'grey.300', mb: 2 }} />
+            <Typography variant="h6" gutterBottom>
+              No quotes found
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              You haven't saved any quotes yet. Create a quote and save it to see it here.
+            </Typography>
+          </Paper>
         ) : (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Quote Number</TableCell>
-                  <TableCell>Created Date</TableCell>
-                  <TableCell>Items</TableCell>
-                  <TableCell align="right">Total</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="center">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {quotes.map((quote) => (
-                  <TableRow key={quote.id} hover>
-                    <TableCell>
-                      <Typography variant="subtitle2">{quote.quoteNumber}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(quote.createdAt), 'dd/MM/yyyy')}
-                    </TableCell>
-                    <TableCell>
-                      {quote.items?.length || 0} items
-                    </TableCell>
-                    <TableCell align="right">
-                      £{Number(quote.total).toFixed(2)}
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={statusLabels[quote.status]}
-                        color={statusColors[quote.status]}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Button
-                        size="small"
-                        onClick={() => handleViewQuote(quote.id)}
-                      >
-                        View Details
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <>
+            <TableContainer 
+              component={Paper} 
+              sx={{ 
+                boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+                borderRadius: 2,
+              }}
+            >
+              <Table>
+                <TableHead>
+                              <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
+              <TableCell sx={{ fontWeight: 600, color: '#183057', fontSize: '0.875rem' }}>Quote Number</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#183057', fontSize: '0.875rem' }}>Project</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#183057', fontSize: '0.875rem' }}>Date Created</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#183057', fontSize: '0.875rem' }}>Customer</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#183057', fontSize: '0.875rem' }}>Company</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#183057', fontSize: '0.875rem' }} align="center">Items</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#183057', fontSize: '0.875rem' }} align="right">Total</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#183057', fontSize: '0.875rem' }} align="center">Actions</TableCell>
+            </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedQuotes.map((quote) => (
+                    <TableRow key={quote.id} hover>
+                      <TableCell sx={{ color: '#183057', fontSize: '0.875rem' }}>
+                        {quote.quoteNumber}
+                      </TableCell>
+                      <TableCell sx={{ color: '#183057', fontSize: '0.875rem' }}>
+                        {quote.projectRef || '-'}
+                      </TableCell>
+                      <TableCell sx={{ color: '#183057', fontSize: '0.875rem' }}>
+                        {format(new Date(quote.createdAt), 'dd/MM/yyyy')}
+                      </TableCell>
+                      <TableCell sx={{ color: '#183057', fontSize: '0.875rem' }}>{quote.customer.name}</TableCell>
+                      <TableCell sx={{ color: '#183057', fontSize: '0.875rem' }}>{quote.customer.company}</TableCell>
+                      <TableCell align="center">
+                        <Chip 
+                          label={`${quote.items.length} items`} 
+                          size="small" 
+                          sx={{ 
+                            backgroundColor: '#e0f2fe', 
+                            color: '#183057',
+                            fontSize: '0.875rem',
+                            '& .MuiChip-label': {
+                              fontSize: '0.875rem'
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="right" sx={{ color: '#183057', fontSize: '0.875rem' }}>
+                        {quote.totals.total.toLocaleString('en-US', { 
+                          minimumFractionDigits: 2, 
+                          maximumFractionDigits: 2 
+                        })}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                          <Tooltip title="Download PDF">
+                            <IconButton 
+                              size="small" 
+                              onClick={() => handleDownloadPDF(quote)}
+                              sx={{ 
+                                color: '#183057',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(24, 48, 87, 0.08)',
+                                },
+                              }}
+                            >
+                              <DownloadIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Open PDF">
+                            <IconButton 
+                              size="small" 
+                              onClick={() => handleViewPDF(quote)}
+                              sx={{ 
+                                color: '#183057',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(24, 48, 87, 0.08)',
+                                },
+                              }}
+                            >
+                              <PdfIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            
+            <TablePagination
+              component="div"
+              count={filteredQuotes.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+              sx={{ 
+                borderTop: '1px solid #e5e7eb',
+                backgroundColor: 'white',
+              }}
+            />
+          </>
         )}
       </Container>
+      </Box>
     </Layout>
   );
 } 

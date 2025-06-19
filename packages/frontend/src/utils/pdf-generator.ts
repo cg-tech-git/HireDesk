@@ -1,125 +1,222 @@
 import jsPDF from 'jspdf';
+import { SavedQuote } from '@/store/savedQuotesSlice';
 import { format } from 'date-fns';
-import { QuoteWithFullDetails } from '@/services/quote.service';
 
-export const generateQuotePDF = (quote: QuoteWithFullDetails) => {
+export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
   const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let currentY = 20;
+
+  // Helper function to add text
+  const addText = (text: string, x: number, y: number, options?: any) => {
+    doc.text(text, x, y, options);
+  };
+
+  // Header Section - Title and Logo Row (matching modal layout)
+  doc.setFontSize(18);
+  doc.setTextColor(24, 48, 87); // #183057
+  addText('HireDesk Quotation', 20, currentY);
   
-  // Company header
-  doc.setFontSize(20);
-  doc.text('Al Laith Projects Services', 20, 20);
-  doc.setFontSize(10);
-  doc.text('Equipment Rental Services', 20, 28);
-  doc.text('Phone: 0800 123 4567', 20, 34);
-  doc.text('Email: quotes@allaithprojects.com', 20, 40);
+  // Add Alps logo on the right (centered with title text)
+  try {
+    const logoWidth = 30; // Width in PDF units
+    const logoHeight = 15; // Height in PDF units
+    const logoX = pageWidth - 20 - logoWidth;
+    const logoY = currentY - (logoHeight / 2) - 3; // Center logo with title text
+
+    // Add the actual Alps logo using direct path
+    doc.addImage('/images/brands/alps_logo.png', 'PNG', logoX, logoY, logoWidth, logoHeight);
+  } catch (error) {
+    console.error('Failed to load logo:', error);
+    doc.setFontSize(12);
+    doc.setTextColor(24, 48, 87);
+    addText('Al Laith Projects Services', pageWidth - 20, currentY, { align: 'right' });
+  }
   
-  // Quote title
-  doc.setFontSize(16);
-  doc.text(`Quote #${quote.quoteNumber}`, 20, 60);
+  currentY += 15;
   
-  // Quote details
-  doc.setFontSize(10);
-  doc.text(`Date: ${format(new Date(quote.createdAt), 'dd/MM/yyyy')}`, 20, 70);
-  doc.text(`Status: ${quote.status.toUpperCase()}`, 20, 76);
+  // Details Row - Two columns layout (matching modal layout)
+  doc.setFontSize(9);
+  doc.setTextColor(24, 48, 87);
   
-  // Customer section
-  doc.setFontSize(12);
-  doc.text('Customer Details', 20, 90);
-  doc.setFontSize(10);
-  // Note: In real implementation, customer details would come from the quote
-  doc.text('Customer name and details would appear here', 20, 98);
+  // Left column - Quote details
+  const leftStartY = currentY;
+  addText(`Quote #: ${quote.quoteNumber}`, 20, currentY);
+  currentY += 5;
+  addText(`Date: ${format(new Date(quote.createdAt), 'dd/MM/yyyy')}`, 20, currentY);
+  currentY += 5;
+  addText('Phone: +971 4443 6360', 20, currentY);
+  currentY += 5;
+  addText('Email: info@allaith.com', 20, currentY);
   
-  // Equipment items table
-  let yPosition = 115;
-  doc.setFontSize(12);
-  doc.text('Equipment Items', 20, yPosition);
-  yPosition += 10;
+  // Right column - Customer details (aligned right)
+  let rightY = leftStartY;
+  addText(`Customer: ${quote.customer.company || 'Demo Customer'}`, pageWidth - 20, rightY, { align: 'right' });
+  rightY += 5;
+  addText(`Name: ${quote.customer.name}`, pageWidth - 20, rightY, { align: 'right' });
+  rightY += 5;
+  addText(`Email: ${quote.customer.email}`, pageWidth - 20, rightY, { align: 'right' });
+  rightY += 5;
+  addText(`Contact: ${quote.customer.phone}`, pageWidth - 20, rightY, { align: 'right' });
   
-  // Table headers
-  doc.setFontSize(10);
-  doc.text('Equipment', 20, yPosition);
-  doc.text('Period', 80, yPosition);
-  doc.text('Days', 120, yPosition);
-  doc.text('Rate', 140, yPosition);
-  doc.text('Total', 170, yPosition);
+  // Set currentY to the maximum of both columns
+  currentY = Math.max(currentY, rightY);
   
-  // Draw line
-  doc.line(20, yPosition + 2, 190, yPosition + 2);
-  yPosition += 8;
+  currentY += 8;
   
-  // Table rows
-  quote.items.forEach((item) => {
-    doc.text(item.equipment.name, 20, yPosition);
-    doc.text(
-      `${format(new Date(item.startDate), 'dd/MM')} - ${format(new Date(item.endDate), 'dd/MM')}`,
-      80,
-      yPosition
-    );
-    doc.text(item.duration.toString(), 120, yPosition);
-    doc.text(`£${item.dailyRate.toFixed(2)}`, 140, yPosition);
-    doc.text(`£${item.totalPrice.toFixed(2)}`, 170, yPosition);
-    yPosition += 6;
+  // Add divider line
+  doc.setDrawColor(224, 224, 224);
+  doc.line(20, currentY, pageWidth - 20, currentY);
+  currentY += 10;
+  
+  // Project Reference - Above table headers (matching modal layout)
+  if (quote.projectRef) {
+    doc.setFontSize(11);
+    doc.setTextColor(24, 48, 87);
+    addText(`Project: ${quote.projectRef}`, 20, currentY);
+    currentY += 15;
+  }
+  
+  // Table Headers (matching modal layout exactly)
+  doc.setFontSize(8);
+  doc.setTextColor(24, 48, 87);
+  doc.setFont(undefined, 'bold');
+  
+  addText('Equipment', 20, currentY);
+  addText('Start', 80, currentY);
+  addText('End', 105, currentY);
+  addText('Days', 130, currentY, { align: 'center' });
+  addText('Rate/day', 155, currentY, { align: 'right' });
+  addText('Amount', pageWidth - 20, currentY, { align: 'right' });
+  
+  // Add header underline
+  currentY += 2;
+  doc.setDrawColor(238, 238, 238);
+  doc.line(20, currentY, pageWidth - 20, currentY);
+  currentY += 8;
+  
+  // Reset font for items
+  doc.setFont(undefined, 'normal');
+  doc.setTextColor(24, 48, 87);
+  
+
+
+  // Add items (matching modal layout)
+  quote.items.forEach((item, index) => {
+    item.dates.forEach((date, dateIndex) => {
+      if (currentY > 240) {
+        doc.addPage();
+        currentY = 20;
+      }
+      
+      // Alternate row background (matching modal)
+      if ((index + dateIndex) % 2 === 0) {
+        doc.setFillColor(248, 249, 250);
+        doc.rect(20, currentY - 3, pageWidth - 40, 10, 'F');
+      }
+      
+      const days = date.startDate && date.endDate 
+        ? Math.ceil((new Date(date.endDate).getTime() - new Date(date.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
+        : 0;
+      
+      doc.setFontSize(8);
+      doc.setTextColor(24, 48, 87);
+      
+      // Equipment name (bold, matching modal)
+      doc.setFont(undefined, 'bold');
+      addText(item.modelName, 20, currentY);
+      
+      // Equipment category (smaller, italic, gray - matching modal)
+      doc.setFont(undefined, 'italic');
+      doc.setFontSize(7);
+      doc.setTextColor(108, 117, 125); // #6c757d
+      addText(item.category || '', 20, currentY + 4);
+      
+      // Reset font and color for other columns
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(24, 48, 87);
+      addText(date.startDate ? format(new Date(date.startDate), 'dd/MM/yyyy') : '-', 80, currentY);
+      addText(date.endDate ? format(new Date(date.endDate), 'dd/MM/yyyy') : '-', 105, currentY);
+      addText(days.toString(), 130, currentY, { align: 'center' });
+      addText('100.00', 155, currentY, { align: 'right' });
+      addText((days * 100 * item.quantity).toFixed(2), pageWidth - 20, currentY, { align: 'right' });
+      
+      currentY += 12; // Spacing to accommodate category text
+    });
   });
   
-  // Services section (if any)
-  if (quote.services && quote.services.length > 0) {
-    yPosition += 10;
-    doc.setFontSize(12);
-    doc.text('Additional Services', 20, yPosition);
-    yPosition += 10;
-    
-    doc.setFontSize(10);
-    quote.services.forEach((service) => {
-      doc.text(service.service.name, 20, yPosition);
-      doc.text(`£${service.totalPrice.toFixed(2)}`, 170, yPosition);
-      yPosition += 6;
-    });
-  }
+  currentY += 10;
   
-  // Totals
-  yPosition += 10;
-  doc.line(140, yPosition, 190, yPosition);
-  yPosition += 6;
+  // Add divider before totals
+  doc.setDrawColor(224, 224, 224);
+  doc.line(20, currentY, pageWidth - 20, currentY);
+  currentY += 15;
   
-  const subtotal = quote.items.reduce((sum, item) => sum + item.totalPrice, 0);
-  const servicesTotal = quote.services?.reduce((sum, service) => sum + service.totalPrice, 0) || 0;
-  const totalBeforeVAT = subtotal + servicesTotal;
-  const vatAmount = totalBeforeVAT * quote.vatRate;
-  const totalAmount = totalBeforeVAT + vatAmount;
+  // Totals section (matching modal layout with right alignment)
+  doc.setFontSize(9);
+  doc.setTextColor(24, 48, 87);
+  doc.setFont(undefined, 'normal');
   
-  doc.text('Subtotal:', 140, yPosition);
-  doc.text(`£${totalBeforeVAT.toFixed(2)}`, 170, yPosition);
-  yPosition += 6;
+  addText('Subtotal:', 140, currentY);
+  addText(quote.totals.subtotal.toFixed(2), pageWidth - 20, currentY, { align: 'right' });
   
-  doc.text(`VAT (${(quote.vatRate * 100).toFixed(0)}%):`, 140, yPosition);
-  doc.text(`£${vatAmount.toFixed(2)}`, 170, yPosition);
-  yPosition += 6;
+  currentY += 8;
+  addText('VAT (5%):', 140, currentY);
+  addText(quote.totals.vat.toFixed(2), pageWidth - 20, currentY, { align: 'right' });
   
-  doc.setFontSize(12);
-  doc.text('Total:', 140, yPosition);
-  doc.text(`£${totalAmount.toFixed(2)}`, 170, yPosition);
+  currentY += 8;
   
-  // Notes section
-  if (quote.notes) {
-    yPosition += 15;
-    doc.setFontSize(12);
-    doc.text('Notes:', 20, yPosition);
-    yPosition += 8;
-    doc.setFontSize(10);
-    
-    // Split notes into lines
-    const notes = doc.splitTextToSize(quote.notes, 170);
-    notes.forEach((line: string) => {
-      doc.text(line, 20, yPosition);
-      yPosition += 6;
-    });
-  }
+  // Add line above total (matching modal)
+  doc.setDrawColor(224, 224, 224);
+  doc.line(140, currentY, pageWidth - 20, currentY);
+  currentY += 8;
   
-  // Footer
+  // Total (bold, matching modal)
+  doc.setFont(undefined, 'bold');
+  doc.setFontSize(10);
+  addText('Total:', 140, currentY);
+  addText(quote.totals.total.toFixed(2), pageWidth - 20, currentY, { align: 'right' });
+
+  // Simple demo footer
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const footerY = pageHeight - 20;
+  
+  // Add footer line
+  doc.setDrawColor(224, 224, 224);
+  doc.line(20, footerY - 10, pageWidth - 20, footerY - 10);
+  
+  // Add footer text with proper wrapping
+  doc.setFont(undefined, 'normal');
   doc.setFontSize(8);
-  doc.text('This quote is valid for 30 days from the date of issue.', 20, 270);
-  doc.text('Terms and conditions apply.', 20, 275);
+  doc.setTextColor(24, 48, 87);
+  const footerText = 'Thank you for using HireDesk quote automation. A member of our team will contact you at the earliest opportunity to discuss your project requirements. Please note that prices and equipment availability are indicative and subject to final confirmation.';
+  const footerLines = doc.splitTextToSize(footerText, pageWidth - 40);
+  let textY = footerY;
+  footerLines.forEach((line: string) => {
+    addText(line, 20, textY);
+    textY += 4;
+  });
   
-  // Save the PDF
-  doc.save(`quote-${quote.quoteNumber}.pdf`);
+  // Add Privacy Policy and Terms of Service links
+  textY += 4; // Add some spacing
+  doc.setFontSize(7);
+  const linksText = 'Privacy Policy · Terms of Service';
+  const textWidth = doc.getStringUnitWidth(linksText) * 7 / doc.internal.scaleFactor;
+  const centerX = (pageWidth - textWidth) / 2;
+  addText(linksText, centerX, textY);
+
+  return doc;
+};
+
+export const downloadQuotePDF = (quote: SavedQuote) => {
+  const pdf = generateQuotePDF(quote);
+  pdf.save(`quote-${quote.quoteNumber}.pdf`);
+};
+
+export const openQuotePDFInNewTab = (quote: SavedQuote) => {
+  const pdf = generateQuotePDF(quote);
+  const pdfBlob = pdf.output('blob');
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  window.open(pdfUrl, '_blank');
 }; 

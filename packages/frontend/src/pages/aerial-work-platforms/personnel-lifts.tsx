@@ -8,27 +8,15 @@ import {
   Grid,
   Paper,
   IconButton,
-  Button,
-  Modal,
-  Badge,
   Popover,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
 } from '@mui/material';
 import {
   ArrowBack,
-  Add,
-  Remove,
   ChevronRight,
   AddCircle,
 } from '@mui/icons-material';
 import { Layout } from '@/components/Layout/Layout';
-import { FloatingQuoteCart } from '@/components/QuoteCart/FloatingQuoteCart';
-import { addItem } from '@/store/quoteSlice';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { setPendingItem } from '@/store/quoteSlice';
 
 // Personnel lift models data
 const personnelLiftModels = [
@@ -130,80 +118,29 @@ const personnelLiftModels = [
   },
 ];
 
-interface QuoteItem {
-  modelId: number;
-  quantity: number;
-  startDate: Date | null;
-  endDate: Date | null;
-  sameDatesForAll: boolean;
-}
+
 
 export default function PersonnelLiftsPage() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<any>(null);
-  const [quoteItem, setQuoteItem] = useState<QuoteItem>({
-    modelId: 0,
-    quantity: 1,
-    startDate: null,
-    endDate: null,
-    sameDatesForAll: true,
-  });
   const [specsAnchorEl, setSpecsAnchorEl] = useState<null | HTMLElement>(null);
   const [activeModelId, setActiveModelId] = useState<number | null>(null);
 
   const handleAddToQuote = (model: any) => {
-    setSelectedModel(model);
-    setQuoteItem({
+    // Create pending item and let QuoteManager handle the workflow
+    const pendingItem = {
       modelId: model.id,
+      modelName: model.name,
+      manufacturer: model.manufacturer,
+      category: 'Personnel Lifts',
       quantity: 1,
-      startDate: null,
-      endDate: null,
-      sameDatesForAll: true,
-    });
-    setOpenModal(true);
+      dates: [],
+    };
+    
+    dispatch(setPendingItem(pendingItem));
   };
 
-  const handleQuantityChange = (increment: boolean) => {
-    setQuoteItem(prev => ({
-      ...prev,
-      quantity: increment ? prev.quantity + 1 : Math.max(1, prev.quantity - 1),
-    }));
-  };
 
-  const handleModalClose = () => {
-    setOpenModal(false);
-    setSelectedModel(null);
-  };
-
-  const handleQuoteSubmit = () => {
-    if (selectedModel && quoteItem.startDate && quoteItem.endDate) {
-      const dates = quoteItem.sameDatesForAll
-        ? Array(quoteItem.quantity).fill({
-            startDate: quoteItem.startDate.toISOString(),
-            endDate: quoteItem.endDate.toISOString(),
-          })
-        : [
-            {
-              startDate: quoteItem.startDate.toISOString(),
-              endDate: quoteItem.endDate.toISOString(),
-            },
-          ];
-
-      dispatch(
-        addItem({
-          modelId: selectedModel.id,
-          modelName: selectedModel.name,
-          manufacturer: selectedModel.manufacturer,
-          category: 'Personnel Lifts',
-          quantity: quoteItem.quantity,
-          dates,
-        })
-      );
-      handleModalClose();
-    }
-  };
 
   const handleSpecsClick = (event: React.MouseEvent<HTMLElement>, modelId: number) => {
     setSpecsAnchorEl(event.currentTarget);
@@ -217,8 +154,13 @@ export default function PersonnelLiftsPage() {
 
   return (
     <Layout>
-      <Box sx={{ backgroundColor: 'white', minHeight: '100vh', py: 4 }}>
-        <Container maxWidth="lg">
+      <Box sx={{ 
+        backgroundColor: '#fdfdfd', 
+        minHeight: '100vh',
+        mx: -3, // Negate Layout's horizontal padding
+        px: 3,  // Add it back for content
+      }}>
+        <Container maxWidth="lg" sx={{ py: 4 }}>
           {/* Header Section */}
           <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
             <IconButton 
@@ -232,10 +174,7 @@ export default function PersonnelLiftsPage() {
               component="h1"
               sx={{
                 fontWeight: 400,
-                background: 'linear-gradient(to right, #155799, #159957)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
+                color: '#183057',
               }}
             >
               Personnel Lifts
@@ -248,18 +187,32 @@ export default function PersonnelLiftsPage() {
               <Grid item xs={12} sm={6} md={4} key={model.id}>
                 <Paper
                   elevation={0}
+                  className={activeModelId === model.id && Boolean(specsAnchorEl) ? 'popover-active' : ''}
                   sx={{
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    backgroundColor: 'grey.50',
+                    backgroundColor: '#f1f5f9', // slate-100
                     transition: 'all 0.3s ease',
                     overflow: 'hidden',
-                    '&:hover': {
+                    '&:hover, &.popover-active': {
                       transform: 'translateY(-4px)',
                       boxShadow: 3,
                       '& img': {
                         transform: 'scale(1.1)',
+                      },
+                      // Hover effect for all cards
+                      '& .card-content': {
+                        backgroundColor: '#183057',
+                      },
+                      '& .card-title, & .card-description, & .card-specs, & .card-button': {
+                        color: 'white !important',
+                      },
+                      '& .card-border': {
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                      },
+                      '& .add-button svg': {
+                        color: 'white !important',
                       },
                     },
                   }}
@@ -290,25 +243,28 @@ export default function PersonnelLiftsPage() {
                   </Box>
 
                   {/* Content Section */}
-                  <Box sx={{ 
-                    p: 3,
-                    flexGrow: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    backgroundColor: 'grey.50',
-                    position: 'relative',
-                    minHeight: '280px',
-                  }}>
+                  <Box 
+                    className="card-content"
+                    sx={{ 
+                      p: 3,
+                      flexGrow: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      backgroundColor: '#f1f5f9', // slate-100
+                      position: 'relative',
+                      minHeight: '280px',
+                      transition: 'background-color 0.3s ease',
+                    }}
+                  >
                     {/* Model Name */}
                     <Typography
+                      className="card-title"
                       variant="h6"
                       sx={{
                         mb: 1,
-                        background: 'linear-gradient(to right, #155799, #159957)',
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        color: 'transparent',
+                        color: '#183057',
                         fontWeight: 600,
+                        transition: 'color 0.3s ease',
                       }}
                     >
                       {model.name}
@@ -316,13 +272,15 @@ export default function PersonnelLiftsPage() {
 
                     {/* Model Description */}
                     <Typography
+                      className="card-description"
                       variant="body2"
                       sx={{
-                        color: 'text.secondary',
+                        color: '#183057',
                         mb: 2,
                         lineHeight: 1.6,
                         fontSize: '0.875rem',
                         flexGrow: 1,
+                        transition: 'color 0.3s ease',
                       }}
                     >
                       {model.id === 1 ? 
@@ -343,6 +301,7 @@ export default function PersonnelLiftsPage() {
 
                     {/* View Specifications and Add Button Row */}
                     <Box 
+                      className="card-border"
                       sx={{ 
                         display: 'flex', 
                         alignItems: 'center',
@@ -351,6 +310,7 @@ export default function PersonnelLiftsPage() {
                         pt: 2,
                         borderTop: '1px solid',
                         borderColor: 'grey.200',
+                        transition: 'border-color 0.3s ease',
                       }}
                     >
                       <Box 
@@ -362,39 +322,40 @@ export default function PersonnelLiftsPage() {
                         onClick={(e) => handleSpecsClick(e, model.id)}
                       >
                         <Typography
+                          className="card-specs"
                           variant="subtitle1"
                           sx={{
-                            color: '#155799',
-                            fontWeight: 500,
+                            color: '#183057',
+                            fontWeight: 400,
                             fontSize: '0.9rem',
+                            transition: 'color 0.3s ease',
                           }}
                         >
                           View Specifications
                         </Typography>
                         <ChevronRight 
+                          className="card-specs"
                           sx={{
                             ml: 1,
-                            background: 'linear-gradient(to right, #155799, #159957)',
-                            backgroundClip: 'text',
-                            WebkitBackgroundClip: 'text',
-                            color: 'transparent',
+                            color: '#183057',
                             fontSize: '1.2rem',
                             transform: activeModelId === model.id && specsAnchorEl ? 'rotate(90deg)' : 'none',
-                            transition: 'transform 0.2s',
+                            transition: 'transform 0.2s, color 0.3s ease',
                           }}
                         />
                       </Box>
 
                       <IconButton
+                        className="add-button"
                         onClick={() => handleAddToQuote(model)}
                         sx={{
                           padding: 0.5,
                           '&:hover': {
-                            backgroundColor: 'transparent',
+                            backgroundColor: 'white',
                           },
                         }}
                       >
-                        <AddCircle sx={{ color: '#155799', fontSize: '1.5rem' }} />
+                        <AddCircle sx={{ color: '#183057', fontSize: '1.5rem', transition: 'color 0.3s ease' }} />
                       </IconButton>
                     </Box>
                   </Box>
@@ -428,8 +389,8 @@ export default function PersonnelLiftsPage() {
                         <Typography
                           variant="body2"
                           sx={{
-                            color: 'text.secondary',
-                            fontWeight: 600,
+                            color: '#183057',
+                            fontWeight: 400,
                             textTransform: 'uppercase',
                             fontSize: '0.75rem',
                             mb: 0.5,
@@ -440,7 +401,7 @@ export default function PersonnelLiftsPage() {
                         <Typography
                           variant="body1"
                           sx={{
-                            fontWeight: 600,
+                            fontWeight: 400,
                           }}
                         >
                           {model.keySpecs.maxWorkingHeight}
@@ -452,8 +413,8 @@ export default function PersonnelLiftsPage() {
                         <Typography
                           variant="body2"
                           sx={{
-                            color: 'text.secondary',
-                            fontWeight: 600,
+                            color: '#183057',
+                            fontWeight: 400,
                             textTransform: 'uppercase',
                             fontSize: '0.75rem',
                             mb: 0.5,
@@ -464,7 +425,7 @@ export default function PersonnelLiftsPage() {
                         <Typography
                           variant="body1"
                           sx={{
-                            fontWeight: 600,
+                            fontWeight: 400,
                           }}
                         >
                           {model.keySpecs.maxPlatformCapacity}
@@ -477,8 +438,8 @@ export default function PersonnelLiftsPage() {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: 'text.secondary',
-                              fontWeight: 500,
+                              color: '#183057',
+                              fontWeight: 400,
                               textTransform: 'capitalize',
                               fontSize: '0.75rem',
                               mb: 0.5,
@@ -489,7 +450,7 @@ export default function PersonnelLiftsPage() {
                           <Typography
                             variant="body1"
                             sx={{
-                              fontWeight: 500,
+                              fontWeight: 400,
                             }}
                           >
                             {value}
@@ -503,161 +464,7 @@ export default function PersonnelLiftsPage() {
             ))}
           </Grid>
 
-          {/* Add to Quote Modal */}
-          <Modal
-            open={openModal}
-            onClose={handleModalClose}
-            aria-labelledby="add-to-quote-modal"
-          >
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: { xs: '90%', sm: 500 },
-                bgcolor: 'background.paper',
-                boxShadow: 24,
-                p: 4,
-                borderRadius: 1,
-              }}
-            >
-              <Typography variant="h6" component="h2" gutterBottom>
-                Add to Quote
-              </Typography>
-              {selectedModel && (
-                <Typography variant="subtitle1" sx={{ mb: 3 }}>
-                  {selectedModel.name}
-                </Typography>
-              )}
 
-              {/* Quantity Selector */}
-              <Box sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
-                <Typography sx={{ mr: 2 }}>Quantity:</Typography>
-                <IconButton
-                  size="small"
-                  onClick={() => handleQuantityChange(false)}
-                >
-                  <Remove />
-                </IconButton>
-                <Typography sx={{ mx: 2 }}>{quoteItem.quantity}</Typography>
-                <IconButton
-                  size="small"
-                  onClick={() => handleQuantityChange(true)}
-                >
-                  <Add />
-                </IconButton>
-              </Box>
-
-              {/* Date Selection Type */}
-              <RadioGroup
-                value={quoteItem.sameDatesForAll}
-                onChange={(e) => setQuoteItem(prev => ({
-                  ...prev,
-                  sameDatesForAll: e.target.value === 'true'
-                }))}
-                sx={{ mb: 3 }}
-              >
-                <FormControlLabel
-                  value={true}
-                  control={<Radio />}
-                  label="Same dates for all units"
-                />
-                <FormControlLabel
-                  value={false}
-                  control={<Radio />}
-                  label="Different dates per unit"
-                />
-              </RadioGroup>
-
-              {/* Date Pickers */}
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <Box sx={{ mb: 3 }}>
-                  {Array.from({ length: quoteItem.sameDatesForAll ? 1 : quoteItem.quantity }).map((_, index) => (
-                    <Box key={index} sx={{ mb: 2 }}>
-                      {!quoteItem.sameDatesForAll && (
-                        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                          Unit {index + 1}
-                        </Typography>
-                      )}
-                      <Box sx={{ display: 'flex', gap: 2 }}>
-                        <DatePicker
-                          label="Start Date"
-                          value={quoteItem.startDate}
-                          onChange={(newValue) => setQuoteItem(prev => ({
-                            ...prev,
-                            startDate: newValue
-                          }))}
-                          sx={{ flex: 1 }}
-                        />
-                        <DatePicker
-                          label="End Date"
-                          value={quoteItem.endDate}
-                          onChange={(newValue) => setQuoteItem(prev => ({
-                            ...prev,
-                            endDate: newValue
-                          }))}
-                          sx={{ flex: 1 }}
-                        />
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </LocalizationProvider>
-
-              {/* Action Buttons */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
-                <Button 
-                  onClick={handleModalClose}
-                  sx={{
-                    color: '#155799',
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                    },
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={handleQuoteSubmit}
-                  sx={{
-                    borderRadius: '50px',
-                    backgroundColor: 'white',
-                    border: '1px solid',
-                    borderColor: 'grey.300',
-                    background: 'white',
-                    px: 4,
-                    '&:hover': {
-                      backgroundColor: 'grey.50',
-                      borderColor: 'grey.400',
-                    },
-                    '& .MuiButton-label': {
-                      background: 'linear-gradient(to right, #155799, #159957)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      color: 'transparent',
-                    },
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      background: 'linear-gradient(to right, #155799, #159957)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      color: 'transparent',
-                      fontWeight: 500,
-                    }}
-                  >
-                    Add to Quote
-                  </Typography>
-                </Button>
-              </Box>
-            </Box>
-          </Modal>
-
-          {/* Floating Quote Cart */}
-          <FloatingQuoteCart />
         </Container>
       </Box>
     </Layout>

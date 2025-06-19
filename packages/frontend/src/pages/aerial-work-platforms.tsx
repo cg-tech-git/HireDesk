@@ -80,22 +80,21 @@ export default function AerialWorkPlatformsPage() {
 
   return (
     <Layout>
-      <Box sx={{ backgroundColor: 'white', minHeight: '100vh', py: 4 }}>
-        <Container maxWidth="lg">
+      <Box sx={{ 
+        backgroundColor: '#fdfdfd', 
+        minHeight: '100vh',
+        mx: -3, // Negate Layout's horizontal padding
+        px: 3,  // Add it back for content
+      }}>
+        <Container maxWidth="lg" sx={{ py: 4 }}>
           {/* Header Section */}
           <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Typography 
-              variant="h3" 
-              component="h1" 
-              gutterBottom
+              variant="h4" 
+              component="h1"
               sx={{
                 fontWeight: 400,
-                background: 'linear-gradient(to right, #155799, #159957)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
-                display: 'inline-block',
-                mb: 3,
+                color: '#183057',
               }}
             >
               Aerial Work Platforms
@@ -105,7 +104,8 @@ export default function AerialWorkPlatformsPage() {
               sx={{ 
                 maxWidth: '800px',
                 mx: 'auto',
-                color: 'text.secondary',
+                mt: 3,
+                color: '#183057',
                 lineHeight: 1.8,
                 fontSize: '1.1rem',
               }}
@@ -126,7 +126,7 @@ export default function AerialWorkPlatformsPage() {
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    backgroundColor: 'grey.50',
+                    backgroundColor: '#f1f5f9', // slate-100
                     transition: 'all 0.3s ease',
                     cursor: 'pointer',
                     overflow: 'hidden',
@@ -135,6 +135,19 @@ export default function AerialWorkPlatformsPage() {
                       boxShadow: 3,
                       '& img': {
                         transform: 'scale(1.1)',
+                      },
+                      // Hover effect for all cards
+                      '& .card-content': {
+                        backgroundColor: '#183057',
+                      },
+                      '& .card-title, & .card-description, & .view-details-btn': {
+                        color: 'white !important',
+                      },
+                      '& .view-details-btn svg': {
+                        color: 'white !important',
+                      },
+                      '& .card-border': {
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
                       },
                     },
                   }}
@@ -195,58 +208,60 @@ export default function AerialWorkPlatformsPage() {
                   </Box>
 
                   {/* Content */}
-                  <Box sx={{ 
-                    p: 2, 
-                    flexGrow: 1, 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    backgroundColor: 'grey.50'
-                  }}>
+                  <Box 
+                    className="card-content"
+                    sx={{ 
+                      p: 2, 
+                      flexGrow: 1, 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      backgroundColor: '#f1f5f9', // slate-100
+                      transition: 'background-color 0.3s ease',
+                    }}
+                  >
                     <Typography 
+                      className="card-title"
                       variant="h6" 
                       gutterBottom
                       sx={{ 
-                        fontWeight: 500,
-                        background: 'linear-gradient(to right, #155799, #159957)',
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        color: 'transparent',
-                        fontSize: '0.95rem',
+                        color: '#183057',
+                        fontWeight: 600,
+                        transition: 'color 0.3s ease',
                       }}
                     >
                       {equipment.title}
                     </Typography>
                     <Typography 
+                      className="card-description"
                       variant="body2" 
                       sx={{ 
-                        color: 'text.secondary',
+                        color: '#183057',
                         mb: 2,
                         flexGrow: 1,
                         fontSize: '0.85rem',
+                        transition: 'color 0.3s ease',
                       }}
                     >
                       {equipment.description}
                     </Typography>
                     <Box
+                      className="card-border"
                       sx={{
                         pt: 2,
                         borderTop: '1px solid',
                         borderColor: 'grey.200',
+                        transition: 'border-color 0.3s ease',
                       }}
                     >
                       <Button
                         className="view-details-btn"
-                        endIcon={<ArrowForward sx={{ fontSize: '0.9rem', background: 'linear-gradient(to right, #155799, #159957)', backgroundClip: 'text', WebkitBackgroundClip: 'text', color: 'transparent' }} />}
+                        endIcon={<ArrowForward sx={{ fontSize: '0.9rem', color: '#183057', fontWeight: 400 }} />}
                         sx={{
                           justifyContent: 'flex-start',
-                          background: 'linear-gradient(to right, #155799, #159957)',
-                          backgroundClip: 'text',
-                          WebkitBackgroundClip: 'text',
-                          color: 'transparent',
-                          fontSize: '0.85rem',
-                          pl: 0,
-                          minWidth: 'auto',
+                          color: '#183057',
+                          fontWeight: 400,
                           textDecoration: 'none',
+                          transition: 'color 0.3s ease',
                           '&:hover': {
                             backgroundColor: 'transparent',
                           },

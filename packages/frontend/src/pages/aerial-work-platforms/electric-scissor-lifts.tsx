@@ -138,10 +138,24 @@ export default function ElectricScissorLiftsPage() {
   const [specsAnchorEl, setSpecsAnchorEl] = useState<null | HTMLElement>(null);
   const [activeModelId, setActiveModelId] = useState<number | null>(null);
 
+  // Map mock model names to database equipment UUIDs
+  const getEquipmentUUID = (modelName: string): string => {
+    const equipmentMap: {[key: string]: string} = {
+      'Genie GS-4047': '3886bf1e-3852-440a-a0c5-987487bdf0e8', // Exact match
+      'JLG 4045R': '3886bf1e-3852-440a-a0c5-987487bdf0e8', // Map to similar Genie model as fallback
+      'Genie GS-3246': '7b93f451-de8d-42b2-b11c-1e7d338e1e6b', // Exact match
+      'JLG 3246ES': '7b93f451-de8d-42b2-b11c-1e7d338e1e6b', // Map to similar Genie model as fallback
+      'Genie GS-1930': '9648a6c3-a7a0-4301-a202-23b45d12e8c0', // Exact match
+      'JLG 1532R': '9648a6c3-a7a0-4301-a202-23b45d12e8c0', // Map to similar Genie model as fallback
+    };
+    
+    return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found
+  };
+
   const handleAddToQuote = (model: any) => {
     // Create pending item and let QuoteManager handle the workflow
     const pendingItem = {
-      modelId: model.id,
+      modelId: getEquipmentUUID(model.name), // Use correct equipment UUID
       modelName: model.name,
       manufacturer: model.manufacturer,
       category: 'Electric Scissor Lifts',

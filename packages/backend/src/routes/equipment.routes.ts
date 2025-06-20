@@ -5,10 +5,18 @@ import { UserRole } from '@hiredesk/shared';
 
 const router = Router();
 
+// Test routes without auth for development
+router.get('/ping', EquipmentController.ping);
+router.get('/test', EquipmentController.getAll);
+router.get('/test-db', EquipmentController.testDb);
+router.get('/test-rates/:id', EquipmentController.getRateCards);
+router.get('/test-price/:id', EquipmentController.calculatePrice);
+
 // Public routes (authenticated users can view equipment)
 router.get('/', authenticate, EquipmentController.getAll);
 router.get('/:id', authenticate, EquipmentController.getById);
 router.get('/:id/rate-cards', authenticate, EquipmentController.getRateCards);
+router.get('/:id/calculate-price', authenticate, EquipmentController.calculatePrice);
 
 // Admin routes
 router.post('/', authenticate, authorize(UserRole.ADMIN), EquipmentController.create);

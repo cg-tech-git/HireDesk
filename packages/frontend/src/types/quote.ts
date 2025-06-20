@@ -12,7 +12,7 @@ export interface DateRange {
 }
 
 export interface QuoteItem {
-  modelId: number;
+  modelId: string; // Changed from number to string to support UUIDs
   modelName: string;
   manufacturer: string;
   category: string;

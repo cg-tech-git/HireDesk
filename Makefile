@@ -44,6 +44,36 @@ db-migrate:
 db-seed:
 	cd packages/backend && npm run seed
 
+# Database schema setup
+db-init:
+	cd scripts && psql -h localhost -U postgres -d hiredesk -f init-db.sql
+
+db-pricing-schema:
+	cd scripts && psql -h localhost -U postgres -d hiredesk -f pricing-schema.sql
+
+db-setup: db-init db-pricing-schema
+	@echo "✅ Database schema setup completed"
+
+# Pricing data import
+pricing-import:
+	@echo "Usage: make pricing-import CSV_FILE=path/to/file.csv"
+	@if [ -z "$(CSV_FILE)" ]; then \
+		echo "❌ Error: CSV_FILE parameter is required"; \
+		echo "Example: make pricing-import CSV_FILE=pricing_data/HireDesk_Master_Pricing.csv"; \
+		exit 1; \
+	fi
+	cd scripts && npm install && npx ts-node import-pricing.ts "../$(CSV_FILE)"
+
+# Complete setup with pricing import
+setup-with-pricing:
+	@echo "Usage: make setup-with-pricing CSV_FILE=path/to/file.csv"
+	@if [ -z "$(CSV_FILE)" ]; then \
+		echo "❌ Error: CSV_FILE parameter is required"; \
+		echo "Example: make setup-with-pricing CSV_FILE='pricing_data/HireDesk_Master_Pricing - Sheet1.csv'"; \
+		exit 1; \
+	fi
+	cd scripts && ./setup-and-import.sh "../$(CSV_FILE)"
+
 # Linting and formatting
 lint:
 	npm run lint
@@ -62,5 +92,8 @@ help:
 	@echo "  make docker-up  - Start Docker services"
 	@echo "  make docker-down - Stop Docker services"
 	@echo "  make setup      - Initial project setup"
+	@echo "  make db-setup   - Initialize database schema"
+	@echo "  make pricing-import CSV_FILE=path - Import pricing data from CSV"
+	@echo "  make setup-with-pricing CSV_FILE=path - Complete setup with pricing"
 	@echo "  make lint       - Run linters"
 	@echo "  make format     - Format code" 

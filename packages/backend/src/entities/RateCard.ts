@@ -17,6 +17,9 @@ export class RateCard extends BaseEntity {
   @Column({ name: 'daily_rate', type: 'decimal', precision: 10, scale: 2 })
   dailyRate: number;
 
+  @Column({ name: 'period', type: 'varchar', length: 10, default: 'Daily' })
+  period: string;
+
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 

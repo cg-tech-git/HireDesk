@@ -1,4 +1,4 @@
-import { api, apiEndpoints } from '@/lib/api';
+import api, { apiEndpoints } from '@/lib/api';
 import { 
   Equipment, 
   EquipmentWithRelations,
@@ -10,7 +10,7 @@ import {
 import { mockEquipment, mockCategories, mockRateCards } from '@/lib/mockData';
 
 // Flag to enable demo mode
-const DEMO_MODE = true;
+const DEMO_MODE = false;
 
 export const equipmentService = {
   async getEquipment(params?: {

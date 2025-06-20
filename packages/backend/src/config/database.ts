@@ -3,8 +3,8 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { createLogger } from './logger';
 
-// Load environment variables
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+// Load environment variables from env.local (user couldn't create .env.local)
+dotenv.config({ path: path.resolve(process.cwd(), 'env.local') });
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isTest = process.env.NODE_ENV === 'test';

@@ -15,6 +15,12 @@ export class Equipment extends BaseEntity {
   @Column({ type: 'text' })
   description: string;
 
+  @Column({ name: 'model_id', nullable: true })
+  modelId?: string;
+
+  @Column({ nullable: true })
+  manufacturer?: string;
+
   @Column({ type: 'jsonb', default: {} })
   specifications: Record<string, string | number>;
 

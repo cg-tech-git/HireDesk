@@ -1,0 +1,127 @@
+Category,Sub-category,Model Name,Model ID,Min Days,Max Days,Rate,Period
+Aerial Work Platforms,Articulated Diesel Boom Lifts,Genie Z-45/25J RT,genie-z-45/25j-rt,1,7,700.00,Daily
+Aerial Work Platforms,Articulated Diesel Boom Lifts,Genie Z-45/25J RT,genie-z-45/25j-rt,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,Genie Z-45/25J RT,genie-z-45/25j-rt,15,999,"3,500.00",Monthly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,JLG 450AJ,jlg-450aj,1,7,700.00,Daily
+Aerial Work Platforms,Articulated Diesel Boom Lifts,JLG 450AJ,jlg-450aj,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,JLG 450AJ,jlg-450aj,15,999,"3,500.00",Monthly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,Genie Z-62/40,genie-z-62/40,1,7,800.00,Daily
+Aerial Work Platforms,Articulated Diesel Boom Lifts,Genie Z-62/40,genie-z-62/40,8,14,"2,500.00",Weekly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,Genie Z-62/40,genie-z-62/40,15,999,"5,000.00",Monthly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,JLG 600AJ,jlg-600aj,1,7,800.00,Daily
+Aerial Work Platforms,Articulated Diesel Boom Lifts,JLG 600AJ,jlg-600aj,8,14,"2,500.00",Weekly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,JLG 600AJ,jlg-600aj,15,999,"5,000.00",Monthly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,Genie Z-80/60,genie-z-80/60,1,7,"1,000.00",Daily
+Aerial Work Platforms,Articulated Diesel Boom Lifts,Genie Z-80/60,genie-z-80/60,8,14,"3,000.00",Weekly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,Genie Z-80/60,genie-z-80/60,15,999,"7,500.00",Monthly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,JLG 800AJ,jlg-800aj,1,7,"1,000.00",Daily
+Aerial Work Platforms,Articulated Diesel Boom Lifts,JLG 800AJ,jlg-800aj,8,14,"3,000.00",Weekly
+Aerial Work Platforms,Articulated Diesel Boom Lifts,JLG 800AJ,jlg-800aj,15,999,"7,500.00",Monthly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,Genie S-60 XC,genie-s-60-xc,1,7,800.00,Daily
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,Genie S-60 XC,genie-s-60-xc,8,14,"2,500.00",Weekly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,Genie S-60 XC,genie-s-60-xc,15,999,"5,000.00",Monthly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,JLG 660SJ,jlg-660sj,1,7,850.00,Daily
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,JLG 660SJ,jlg-660sj,8,14,"2,750.00",Weekly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,JLG 660SJ,jlg-660sj,15,999,"5,500.00",Monthly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,Genie S-85 XC,genie-s-85-xc,1,7,"1,100.00",Daily
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,Genie S-85 XC,genie-s-85-xc,8,14,"3,250.00",Weekly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,Genie S-85 XC,genie-s-85-xc,15,999,"7,500.00",Monthly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,JLG 860SJ,jlg-860sj,1,7,"1,200.00",Daily
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,JLG 860SJ,jlg-860sj,8,14,"4,000.00",Weekly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,JLG 860SJ,jlg-860sj,15,999,"9,000.00",Monthly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,Genie SX-105 XC,genie-sx-105-xc,1,7,"1,400.00",Daily
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,Genie SX-105 XC,genie-sx-105-xc,8,14,"4,500.00",Weekly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,Genie SX-105 XC,genie-sx-105-xc,15,999,"12,000.00",Monthly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,JLG 1200SJP,jlg-1200sjp,1,7,"1,600.00",Daily
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,JLG 1200SJP,jlg-1200sjp,8,14,"5,000.00",Weekly
+Aerial Work Platforms,Telescopic Diesel Boom Lifts,JLG 1200SJP,jlg-1200sjp,15,999,"13,000.00",Monthly
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-45 DC,genie-z-45-dc,1,7,700.00,Daily
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-45 DC,genie-z-45-dc,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-45 DC,genie-z-45-dc,15,999,"3,500.00",Monthly
+Aerial Work Platforms,Electric Boom Lifts,JLG E450AJ,jlg-e450aj,1,7,700.00,Daily
+Aerial Work Platforms,Electric Boom Lifts,JLG E450AJ,jlg-e450aj,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Electric Boom Lifts,JLG E450AJ,jlg-e450aj,15,999,"3,500.00",Monthly
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-60 DC,genie-z-60-dc,1,7,700.00,Daily
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-60 DC,genie-z-60-dc,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-60 DC,genie-z-60-dc,15,999,"4,000.00",Monthly
+Aerial Work Platforms,Electric Boom Lifts,JLG E600J,jlg-e600j,1,7,700.00,Daily
+Aerial Work Platforms,Electric Boom Lifts,JLG E600J,jlg-e600j,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Electric Boom Lifts,JLG E600J,jlg-e600j,15,999,"4,000.00",Monthly
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-80 DC,genie-z-80-dc,1,7,700.00,Daily
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-80 DC,genie-z-80-dc,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-80 DC,genie-z-80-dc,15,999,"4,000.00",Monthly
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-40/23N,genie-z-40/23n,1,7,700.00,Daily
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-40/23N,genie-z-40/23n,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Electric Boom Lifts,Genie Z-40/23N,genie-z-40/23n,15,999,"3,500.00",Monthly
+Aerial Work Platforms,Diesel Scissor Lifts,Genie GS-5390 RT,genie-gs-5390-rt,1,7,800.00,Daily
+Aerial Work Platforms,Diesel Scissor Lifts,Genie GS-5390 RT,genie-gs-5390-rt,8,14,"2,250.00",Weekly
+Aerial Work Platforms,Diesel Scissor Lifts,Genie GS-5390 RT,genie-gs-5390-rt,15,999,"4,500.00",Monthly
+Aerial Work Platforms,Diesel Scissor Lifts,JLG 530LRT,jlg-530lrt,1,7,800.00,Daily
+Aerial Work Platforms,Diesel Scissor Lifts,JLG 530LRT,jlg-530lrt,8,14,"2,250.00",Weekly
+Aerial Work Platforms,Diesel Scissor Lifts,JLG 530LRT,jlg-530lrt,15,999,"4,500.00",Monthly
+Aerial Work Platforms,Diesel Scissor Lifts,Genie GS-4390 RT,genie-gs-4390-rt,1,7,700.00,Daily
+Aerial Work Platforms,Diesel Scissor Lifts,Genie GS-4390 RT,genie-gs-4390-rt,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Diesel Scissor Lifts,Genie GS-4390 RT,genie-gs-4390-rt,15,999,"4,000.00",Monthly
+Aerial Work Platforms,Diesel Scissor Lifts,JLG 430LRT,jlg-430lrt,1,7,700.00,Daily
+Aerial Work Platforms,Diesel Scissor Lifts,JLG 430LRT,jlg-430lrt,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Diesel Scissor Lifts,JLG 430LRT,jlg-430lrt,15,999,"4,000.00",Monthly
+Aerial Work Platforms,Diesel Scissor Lifts,Genie GS-3390 RT,genie-gs-3390-rt,1,7,800.00,Daily
+Aerial Work Platforms,Diesel Scissor Lifts,Genie GS-3390 RT,genie-gs-3390-rt,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Diesel Scissor Lifts,Genie GS-3390 RT,genie-gs-3390-rt,15,999,"4,000.00",Monthly
+Aerial Work Platforms,Diesel Scissor Lifts,JLG 330LRT,jlg-330lrt,1,7,800.00,Daily
+Aerial Work Platforms,Diesel Scissor Lifts,JLG 330LRT,jlg-330lrt,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Diesel Scissor Lifts,JLG 330LRT,jlg-330lrt,15,999,"4,000.00",Monthly
+Aerial Work Platforms,Electric Scissor Lifts,Genie GS-4047,genie-gs-4047,1,7,800.00,Daily
+Aerial Work Platforms,Electric Scissor Lifts,Genie GS-4047,genie-gs-4047,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Electric Scissor Lifts,Genie GS-4047,genie-gs-4047,15,999,"4,000.00",Monthly
+Aerial Work Platforms,Electric Scissor Lifts,JLG 4045R,jlg-4045r,1,7,800.00,Daily
+Aerial Work Platforms,Electric Scissor Lifts,JLG 4045R,jlg-4045r,8,14,"2,000.00",Weekly
+Aerial Work Platforms,Electric Scissor Lifts,JLG 4045R,jlg-4045r,15,999,"4,000.00",Monthly
+Aerial Work Platforms,Electric Scissor Lifts,Genie GS-3246,genie-gs-3246,1,7,600.00,Daily
+Aerial Work Platforms,Electric Scissor Lifts,Genie GS-3246,genie-gs-3246,8,14,"1,500.00",Weekly
+Aerial Work Platforms,Electric Scissor Lifts,Genie GS-3246,genie-gs-3246,15,999,"2,700.00",Monthly
+Aerial Work Platforms,Electric Scissor Lifts,JLG 3246ES,jlg-3246es,1,7,600.00,Daily
+Aerial Work Platforms,Electric Scissor Lifts,JLG 3246ES,jlg-3246es,8,14,"1,500.00",Weekly
+Aerial Work Platforms,Electric Scissor Lifts,JLG 3246ES,jlg-3246es,15,999,"2,700.00",Monthly
+Aerial Work Platforms,Electric Scissor Lifts,Genie GS-1930,genie-gs-1930,1,7,450.00,Daily
+Aerial Work Platforms,Electric Scissor Lifts,Genie GS-1930,genie-gs-1930,8,14,"1,000.00",Weekly
+Aerial Work Platforms,Electric Scissor Lifts,Genie GS-1930,genie-gs-1930,15,999,"1,800.00",Monthly
+Aerial Work Platforms,Electric Scissor Lifts,JLG 1532R,jlg-1532r,1,7,450.00,Daily
+Aerial Work Platforms,Electric Scissor Lifts,JLG 1532R,jlg-1532r,8,14,"1,000.00",Weekly
+Aerial Work Platforms,Electric Scissor Lifts,JLG 1532R,jlg-1532r,15,999,"1,800.00",Monthly
+Aerial Work Platforms,Personnel Lifts,Genie AWP-30S,genie-awp-30s,1,7,600.00,Daily
+Aerial Work Platforms,Personnel Lifts,Genie AWP-30S,genie-awp-30s,8,14,"1,800.00",Weekly
+Aerial Work Platforms,Personnel Lifts,Genie AWP-30S,genie-awp-30s,15,999,"2,500.00",Monthly
+Aerial Work Platforms,Personnel Lifts,JLG 25AM,jlg-25am,1,7,500.00,Daily
+Aerial Work Platforms,Personnel Lifts,JLG 25AM,jlg-25am,8,14,"1,600.00",Weekly
+Aerial Work Platforms,Personnel Lifts,JLG 25AM,jlg-25am,15,999,"2,300.00",Monthly
+Aerial Work Platforms,Personnel Lifts,Genie AWP-25S,genie-awp-25s,1,7,500.00,Daily
+Aerial Work Platforms,Personnel Lifts,Genie AWP-25S,genie-awp-25s,8,14,"1,600.00",Weekly
+Aerial Work Platforms,Personnel Lifts,Genie AWP-25S,genie-awp-25s,15,999,"2,300.00",Monthly
+Aerial Work Platforms,Personnel Lifts,JLG 20AM,jlg-20am,1,7,200.00,Daily
+Aerial Work Platforms,Personnel Lifts,JLG 20AM,jlg-20am,8,14,"1,200.00",Weekly
+Aerial Work Platforms,Personnel Lifts,JLG 20AM,jlg-20am,15,999,"2,500.00",Monthly
+Aerial Work Platforms,Personnel Lifts,Genie AWP-20S,genie-awp-20s,1,7,200.00,Daily
+Aerial Work Platforms,Personnel Lifts,Genie AWP-20S,genie-awp-20s,8,14,"1,200.00",Weekly
+Aerial Work Platforms,Personnel Lifts,Genie AWP-20S,genie-awp-20s,15,999,"2,500.00",Monthly
+Aerial Work Platforms,Personnel Lifts,JLG 15MSP,jlg-15msp,1,7,200.00,Daily
+Aerial Work Platforms,Personnel Lifts,JLG 15MSP,jlg-15msp,8,14,"1,200.00",Weekly
+Aerial Work Platforms,Personnel Lifts,JLG 15MSP,jlg-15msp,15,999,"2,500.00",Monthly
+Aerial Work Platforms,Material Lifts,Genie SLC-24,genie-slc-24,1,7,160.00,Daily
+Aerial Work Platforms,Material Lifts,Genie SLC-24,genie-slc-24,8,14,960.00,Weekly
+Aerial Work Platforms,Material Lifts,Genie SLC-24,genie-slc-24,15,999,"2,000.00",Monthly
+Aerial Work Platforms,Material Lifts,Genie SLC-18,genie-slc-18,1,7,128.00,Daily
+Aerial Work Platforms,Material Lifts,Genie SLC-18,genie-slc-18,8,14,768.00,Weekly
+Aerial Work Platforms,Material Lifts,Genie SLC-18,genie-slc-18,15,999,"1,600.00",Monthly
+Aerial Work Platforms,Material Lifts,Genie GL-12,genie-gl-12,1,7,102.00,Daily
+Aerial Work Platforms,Material Lifts,Genie GL-12,genie-gl-12,8,14,614.00,Weekly
+Aerial Work Platforms,Material Lifts,Genie GL-12,genie-gl-12,15,999,"1,280.00",Monthly
+Aerial Work Platforms,Material Lifts,Genie GL-8,genie-gl-8,1,7,81.00,Daily
+Aerial Work Platforms,Material Lifts,Genie GL-8,genie-gl-8,8,14,491.00,Weekly
+Aerial Work Platforms,Material Lifts,Genie GL-8,genie-gl-8,15,999,"1,024.00",Monthly
+Aerial Work Platforms,Material Lifts,Genie GL-4,genie-gl-4,1,7,65.00,Daily
+Aerial Work Platforms,Material Lifts,Genie GL-4,genie-gl-4,8,14,393.00,Weekly
+Aerial Work Platforms,Material Lifts,Genie GL-4,genie-gl-4,15,999,819.00,Monthly
+Aerial Work Platforms,Material Lifts,Genie GL-10,genie-gl-10,1,7,52.00,Daily
+Aerial Work Platforms,Material Lifts,Genie GL-10,genie-gl-10,8,14,314.00,Weekly
+Aerial Work Platforms,Material Lifts,Genie GL-10,genie-gl-10,15,999,655.00,Monthly

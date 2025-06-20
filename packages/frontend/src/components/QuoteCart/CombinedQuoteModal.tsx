@@ -24,6 +24,10 @@ interface QuoteItem {
   startDate: Date | null;
   endDate: Date | null;
   sameDatesForAll: boolean;
+  individualDates: Array<{
+    startDate: Date | null;
+    endDate: Date | null;
+  }>;
 }
 
 interface CombinedQuoteModalProps {
@@ -64,6 +68,7 @@ export function CombinedQuoteModal({
     startDate: null,
     endDate: null,
     sameDatesForAll: true,
+    individualDates: [{ startDate: null, endDate: null }],
   });
 
   // Load existing project reference if available
@@ -86,7 +91,17 @@ export function CombinedQuoteModal({
   const isFormValid = React.useMemo(() => {
     // If we have existing customer details, we don't need to validate project ref again
     const projectValid = existingCustomerDetails ? true : projectRef.trim().length > 0;
-    const quoteValid = !!(quoteItem.startDate && quoteItem.endDate);
+    
+    // Check quote validity based on the selected date mode
+    let quoteValid = false;
+    if (quoteItem.sameDatesForAll) {
+      quoteValid = !!(quoteItem.startDate && quoteItem.endDate);
+    } else {
+      // All individual units must have dates
+      quoteValid = quoteItem.individualDates.every(
+        dates => dates.startDate && dates.endDate
+      );
+    }
     
     const isValid = projectValid && quoteValid;
     
@@ -96,18 +111,34 @@ export function CombinedQuoteModal({
       projectValid,
       startDate: quoteItem.startDate,
       endDate: quoteItem.endDate,
+      sameDatesForAll: quoteItem.sameDatesForAll,
+      individualDates: quoteItem.individualDates,
       quoteValid,
       isValid
     });
     
     return isValid;
-  }, [existingCustomerDetails, projectRef, quoteItem.startDate, quoteItem.endDate]);
+  }, [existingCustomerDetails, projectRef, quoteItem.startDate, quoteItem.endDate, quoteItem.sameDatesForAll, quoteItem.individualDates]);
 
   const handleQuantityChange = (increment: boolean) => {
-    setQuoteItem(prev => ({
-      ...prev,
-      quantity: increment ? prev.quantity + 1 : Math.max(1, prev.quantity - 1),
-    }));
+    setQuoteItem(prev => {
+      const newQuantity = increment ? prev.quantity + 1 : Math.max(1, prev.quantity - 1);
+      const newIndividualDates = [...prev.individualDates];
+      
+      if (increment) {
+        // Add a new date pair
+        newIndividualDates.push({ startDate: null, endDate: null });
+      } else if (newQuantity < prev.quantity && newIndividualDates.length > 1) {
+        // Remove the last date pair
+        newIndividualDates.pop();
+      }
+      
+      return {
+        ...prev,
+        quantity: newQuantity,
+        individualDates: newIndividualDates,
+      };
+    });
   };
 
   const handleProjectRefChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,21 +150,28 @@ export function CombinedQuoteModal({
   };
 
   const handleSubmit = () => {
-    if (!isFormValid || !quoteItem.startDate || !quoteItem.endDate) {
+    if (!isFormValid) {
       return;
     }
 
-    const dates = quoteItem.sameDatesForAll
-      ? Array(quoteItem.quantity).fill({
-          startDate: quoteItem.startDate.toISOString(),
-          endDate: quoteItem.endDate.toISOString(),
-        })
-      : [
-          {
-            startDate: quoteItem.startDate.toISOString(),
-            endDate: quoteItem.endDate.toISOString(),
-          },
-        ];
+    let dates;
+    if (quoteItem.sameDatesForAll) {
+      if (!quoteItem.startDate || !quoteItem.endDate) {
+        return;
+      }
+      dates = Array(quoteItem.quantity).fill({
+        startDate: quoteItem.startDate.toISOString(),
+        endDate: quoteItem.endDate.toISOString(),
+      });
+    } else {
+      // Use individual dates for each unit
+      dates = quoteItem.individualDates
+        .filter(dates => dates.startDate && dates.endDate)
+        .map(dates => ({
+          startDate: dates.startDate!.toISOString(),
+          endDate: dates.endDate!.toISOString(),
+        }));
+    }
 
     // Create customer details combining mock data with project reference
     const customerDetails: CustomerDetails = existingCustomerDetails || {
@@ -158,6 +196,7 @@ export function CombinedQuoteModal({
       startDate: null,
       endDate: null,
       sameDatesForAll: true,
+      individualDates: [{ startDate: null, endDate: null }],
     });
     setProjectRefError('');
   };
@@ -172,6 +211,7 @@ export function CombinedQuoteModal({
       startDate: null,
       endDate: null,
       sameDatesForAll: true,
+      individualDates: [{ startDate: null, endDate: null }],
     });
     setProjectRefError('');
     onClose();
@@ -318,13 +358,9 @@ export function CombinedQuoteModal({
           {/* Date Pickers */}
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box sx={{ mb: 3 }}>
-              {Array.from({ length: quoteItem.sameDatesForAll ? 1 : quoteItem.quantity }).map((_, index) => (
-                <Box key={index} sx={{ mb: 2 }}>
-                  {!quoteItem.sameDatesForAll && (
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                      Unit {index + 1}
-                    </Typography>
-                  )}
+              {quoteItem.sameDatesForAll ? (
+                // Single date picker for all units
+                <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', gap: 2 }}>
                     <DatePicker
                       label="Start Date"
@@ -348,7 +384,42 @@ export function CombinedQuoteModal({
                     />
                   </Box>
                 </Box>
-              ))}
+              ) : (
+                // Individual date pickers for each unit
+                quoteItem.individualDates.map((dates, index) => (
+                  <Box key={index} sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                      Unit {index + 1}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                      <DatePicker
+                        label="Start Date"
+                        value={dates.startDate}
+                        onChange={(newValue) => setQuoteItem(prev => ({
+                          ...prev,
+                          individualDates: prev.individualDates.map((item, i) => 
+                            i === index ? { ...item, startDate: newValue } : item
+                          )
+                        }))}
+                        format="dd/MM/yyyy" 
+                        sx={{ flex: 1 }}
+                      />
+                      <DatePicker
+                        label="End Date"
+                        value={dates.endDate}
+                        onChange={(newValue) => setQuoteItem(prev => ({
+                          ...prev,
+                          individualDates: prev.individualDates.map((item, i) => 
+                            i === index ? { ...item, endDate: newValue } : item
+                          )
+                        }))}
+                        format="dd/MM/yyyy" 
+                        sx={{ flex: 1 }}
+                      />
+                    </Box>
+                  </Box>
+                ))
+              )}
             </Box>
           </LocalizationProvider>
         </Box>

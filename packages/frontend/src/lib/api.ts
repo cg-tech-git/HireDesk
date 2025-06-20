@@ -14,30 +14,30 @@ export default api;
 // Type-safe API endpoints
 export const apiEndpoints = {
   auth: {
-    login: '/api/v1/auth/login',
-    register: '/api/v1/auth/register',
-    me: '/api/v1/auth/me',
+    login: '/auth/login',
+    register: '/auth/register',
+    me: '/auth/me',
   },
   equipment: {
-    list: '/api/v1/equipment',
-    get: (id: string) => `/api/v1/equipment/${id}`,
-    rateCards: (id: string) => `/api/v1/equipment/${id}/rate-cards`,
+    list: '/equipment/test',
+    get: (id: string) => `/equipment/${id}`,
+    rateCards: (id: string) => `/equipment/test-rates/${id}`,
   },
   categories: {
-    list: '/api/v1/categories',
-    get: (id: string) => `/api/v1/categories/${id}`,
+    list: '/categories',
+    get: (id: string) => `/categories/${id}`,
   },
   quotes: {
-    calculate: '/api/v1/quotes/calculate',
-    create: '/api/v1/quotes',
-    myQuotes: '/api/v1/quotes/my-quotes',
-    get: (id: string) => `/api/v1/quotes/${id}`,
-    update: (id: string) => `/api/v1/quotes/${id}`,
-    submit: (id: string) => `/api/v1/quotes/${id}/submit`,
-    download: (id: string) => `/api/v1/quotes/${id}/download`,
+    calculate: '/quotes/calculate',
+    create: '/quotes',
+    myQuotes: '/quotes/my-quotes',
+    get: (id: string) => `/quotes/${id}`,
+    update: (id: string) => `/quotes/${id}`,
+    submit: (id: string) => `/quotes/${id}/submit`,
+    download: (id: string) => `/quotes/${id}/download`,
   },
   services: {
-    list: '/api/v1/services',
-    get: (id: string) => `/api/v1/services/${id}`,
+    list: '/services',
+    get: (id: string) => `/services/${id}`,
   },
 } as const; 

@@ -136,10 +136,24 @@ export default function TelescopicDieselBoomLiftsPage() {
   const [specsAnchorEl, setSpecsAnchorEl] = useState<null | HTMLElement>(null);
   const [activeModelId, setActiveModelId] = useState<number | null>(null);
 
+  // Map mock model names to database equipment UUIDs
+  const getEquipmentUUID = (modelName: string): string => {
+    const equipmentMap: {[key: string]: string} = {
+      'Genie S-60 XC': '6ccc5c52-8f0d-4f87-879a-d8c18b605368',
+      'JLG 660SJ': '6ccc5c52-8f0d-4f87-879a-d8c18b605368', // Map to similar Genie model as fallback
+      'Genie S-85 XC': 'c3637ef2-9e37-455f-a93f-40e374808190',
+      'JLG 860SJ': 'c3637ef2-9e37-455f-a93f-40e374808190', // Map to similar Genie model as fallback
+      'Genie SX-105 XC': '6246f529-948f-4977-b605-96a83cfbc120',
+      'JLG 1200SJP': '6246f529-948f-4977-b605-96a83cfbc120', // Map to similar Genie model as fallback
+    };
+    
+    return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found
+  };
+
   const handleAddToQuote = (model: any) => {
     // Create pending item and let QuoteManager handle the workflow
     const pendingItem = {
-      modelId: model.id,
+      modelId: getEquipmentUUID(model.name), // Use correct equipment UUID
       modelName: model.name,
       manufacturer: model.manufacturer,
       category: 'Telescopic Diesel Boom Lifts',

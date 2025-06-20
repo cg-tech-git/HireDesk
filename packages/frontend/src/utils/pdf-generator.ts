@@ -2,6 +2,32 @@ import jsPDF from 'jspdf';
 import { SavedQuote } from '@/store/savedQuotesSlice';
 import { format } from 'date-fns';
 
+// Helper function to get rate and period information (matches frontend logic)
+const getRateAndPeriod = (days: number) => {
+  if (days >= 1 && days <= 7) {
+    return { rate: 700, period: 'Daily' }; // Default daily rate
+  } else if (days >= 8 && days <= 14) {
+    return { rate: 2000, period: 'Weekly' }; // Default weekly rate
+  } else if (days >= 15) {
+    return { rate: 3500, period: 'Monthly' }; // Default monthly rate
+  }
+  return { rate: 700, period: 'Daily' };
+};
+
+// Helper function to calculate amount based on period
+const calculateAmount = (rate: number, period: string, days: number) => {
+  if (period === 'Daily') {
+    return rate * days;
+  } else if (period === 'Weekly') {
+    const weeks = days / 7;
+    return rate * weeks;
+  } else if (period === 'Monthly') {
+    const months = Math.max(1, days / 30);
+    return rate * months;
+  }
+  return rate * days; // Fallback
+};
+
 export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -85,8 +111,9 @@ export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
   addText('Equipment', 20, currentY);
   addText('Start', 80, currentY);
   addText('End', 105, currentY);
-  addText('Days', 130, currentY, { align: 'center' });
-  addText('Rate/day', 155, currentY, { align: 'right' });
+  addText('Days', 125, currentY, { align: 'center' });
+  addText('Rate', 145, currentY, { align: 'right' });
+  addText('Period', 165, currentY, { align: 'center' });
   addText('Amount', pageWidth - 20, currentY, { align: 'right' });
   
   // Add header underline
@@ -118,6 +145,10 @@ export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
       const days = date.startDate && date.endDate 
         ? Math.ceil((new Date(date.endDate).getTime() - new Date(date.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
         : 0;
+
+      // Get rate and period information based on days
+      const { rate, period } = getRateAndPeriod(days);
+      const totalAmount = calculateAmount(rate, period, days);
       
       doc.setFontSize(8);
       doc.setTextColor(24, 48, 87);
@@ -138,9 +169,10 @@ export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
       doc.setTextColor(24, 48, 87);
       addText(date.startDate ? format(new Date(date.startDate), 'dd/MM/yyyy') : '-', 80, currentY);
       addText(date.endDate ? format(new Date(date.endDate), 'dd/MM/yyyy') : '-', 105, currentY);
-      addText(days.toString(), 130, currentY, { align: 'center' });
-      addText('100.00', 155, currentY, { align: 'right' });
-      addText((days * 100 * item.quantity).toFixed(2), pageWidth - 20, currentY, { align: 'right' });
+      addText(days.toString(), 125, currentY, { align: 'center' });
+      addText(rate.toFixed(2), 145, currentY, { align: 'right' });
+      addText(period, 165, currentY, { align: 'center' });
+      addText(totalAmount.toFixed(2), pageWidth - 20, currentY, { align: 'right' });
       
       currentY += 12; // Spacing to accommodate category text
     });

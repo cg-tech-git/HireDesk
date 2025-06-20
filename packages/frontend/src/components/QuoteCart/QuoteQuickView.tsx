@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import {
@@ -42,13 +42,87 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
   const dispatch = useDispatch();
   const { items, customerDetails } = useSelector((state: RootState) => state.quote);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [equipmentRates, setEquipmentRates] = useState<{[equipmentId: string]: any[]}>({});
 
-  // Add number formatting function
+  // Add number formatting function (no currency symbol)
   const formatNumber = (value: number): string => {
     return value.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
+  };
+
+  // Fetch equipment rates when items change
+  useEffect(() => {
+    const fetchRates = async () => {
+      const uniqueEquipmentIds = [...new Set(items.map(item => item.modelId))];
+      const ratesData: {[equipmentId: string]: any[]} = {};
+      
+      for (const equipmentId of uniqueEquipmentIds) {
+        try {
+          const response = await fetch(`http://localhost:3001/api/v1/equipment/test-rates/${equipmentId}`);
+          const data = await response.json();
+          if (data.success && data.data) {
+            ratesData[equipmentId] = data.data;
+          }
+        } catch (error) {
+          console.error(`Error fetching rates for ${equipmentId}:`, error);
+          ratesData[equipmentId] = [];
+        }
+              }
+        
+        setEquipmentRates(ratesData);
+    };
+    
+    if (items.length > 0) {
+      fetchRates();
+    }
+  }, [items]);
+
+  // Calculate total amount based on pricing tiers and periods
+  const calculateAmount = (equipmentId: string, days: number): number => {
+    const rates = equipmentRates[equipmentId];
+    if (!rates) return 0;
+    
+    const rateData = rates.find((r: any) => 
+      days >= r.durationMin && days <= r.durationMax
+    );
+    
+    if (!rateData) return 0;
+    
+    const rate = parseFloat(rateData.dailyRate);
+    const period = rateData.period;
+    
+    // Apply pricing logic based on the defined period
+    if (period === 'Daily') {
+      // Daily rate: rate × days
+      return rate * days;
+    } else if (period === 'Weekly') {
+      // Weekly rate: rate × weeks
+      const weeks = days / 7;
+      return rate * weeks;
+    } else if (period === 'Monthly') {
+      // Monthly rate: rate × months (minimum 1 month)
+      const months = Math.max(1, days / 30);
+      return rate * months;
+    }
+    
+    // Fallback to daily calculation if period is unknown
+    return rate * days;
+  };
+
+  // Get display rate and period for showing in the rate column
+  const getDisplayRateAndPeriod = (equipmentId: string, days: number): { rate: number; period: string } => {
+    const rates = equipmentRates[equipmentId];
+    if (!rates) return { rate: 0, period: 'Daily' };
+    
+    const rateData = rates.find((r: any) => 
+      days >= r.durationMin && days <= r.durationMax
+    );
+    return {
+      rate: rateData ? parseFloat(rateData.dailyRate) : 0,
+      period: rateData ? rateData.period : 'Daily'
+    };
   };
 
   const calculateTotalDays = (dates: { startDate: string | null; endDate: string | null }[]) => {
@@ -64,10 +138,16 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
   };
 
   const calculateSubtotal = () => {
-    // This is a dummy calculation - replace with actual pricing logic
+    // Calculate with real pricing from database
     return items.reduce((total, item) => {
-      const days = calculateTotalDays(item.dates);
-      return total + (days * 100 * item.quantity); // Assuming £100 per day
+      return total + item.dates.reduce((itemTotal, date) => {
+        const days = date.startDate && date.endDate 
+          ? Math.ceil((new Date(date.endDate).getTime() - new Date(date.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
+          : 0;
+        
+        const amount = calculateAmount(item.modelId, days);
+        return itemTotal + amount;
+      }, 0);
     }, 0);
   };
 
@@ -369,7 +449,7 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
                 <Box 
                   sx={{ 
                     display: 'grid', 
-                    gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
+                    gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr 1fr',
                     gap: 2,
                     borderBottom: '1px solid #eee',
                     pb: 0.5,
@@ -389,7 +469,10 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
                     Days
                   </Typography>
                   <Typography variant="caption" sx={{ color: '#183057', fontWeight: 500, textAlign: 'right' }}>
-                    Rate/day
+                    Rate
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#183057', fontWeight: 500, textAlign: 'center' }}>
+                    Period
                   </Typography>
                   <Typography variant="caption" sx={{ color: '#183057', fontWeight: 500, textAlign: 'right' }}>
                     Amount
@@ -404,13 +487,17 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
                         const days = date.startDate && date.endDate 
                           ? Math.ceil((new Date(date.endDate).getTime() - new Date(date.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
                           : 0;
+
+                        // Get rate, period and amount from database
+                        const { rate: displayRate, period } = getDisplayRateAndPeriod(item.modelId, days);
+                        const totalAmount = calculateAmount(item.modelId, days);
                         
                         return (
                           <Box 
                             key={dateIndex}
                             sx={{ 
                               display: 'grid', 
-                              gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
+                              gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr 1fr',
                               gap: 2,
                               backgroundColor: (index + dateIndex) % 2 === 0 ? '#f8f9fa' : 'transparent',
                               p: 1,
@@ -436,10 +523,13 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
                               {days}
                             </Typography>
                             <Typography variant="body2" sx={{ color: '#183057', textAlign: 'right', width: '100%' }}>
-                              {formatNumber(100)}
+                              {formatNumber(displayRate)}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: '#183057', textAlign: 'center', width: '100%' }}>
+                              {period}
                             </Typography>
                             <Typography variant="body2" sx={{ color: '#183057', textAlign: 'right', width: '100%' }}>
-                              {formatNumber(days * 100 * item.quantity)}
+                              {formatNumber(totalAmount)}
                             </Typography>
                           </Box>
                         );

@@ -187,4 +187,67 @@ export class EquipmentController {
       next(error);
     }
   }
+
+  static async calculatePrice(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { duration } = req.query;
+      
+      if (!duration || isNaN(Number(duration))) {
+        throw new ApiError(400, 'INVALID_DURATION', 'Duration must be a valid number');
+      }
+
+      const durationDays = Number(duration);
+      const rateCard = await EquipmentService.getAvailableRateCard(id, durationDays);
+
+      if (!rateCard) {
+        throw new ApiError(404, 'RATE_NOT_FOUND', `No rate card found for ${durationDays} days`);
+      }
+
+      res.json({
+        success: true,
+        data: {
+          duration: durationDays,
+          dailyRate: rateCard.dailyRate,
+          totalPrice: rateCard.dailyRate * durationDays,
+          rateCard: {
+            id: rateCard.id,
+            durationMin: rateCard.durationMin,
+            durationMax: rateCard.durationMax,
+            dailyRate: rateCard.dailyRate
+          }
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async testDb(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { AppDataSource } = await import('../config/database');
+      const result = await AppDataSource.query('SELECT name, manufacturer, model_id, is_active FROM equipment LIMIT 5');
+      
+      res.json({
+        success: true,
+        data: result,
+        message: 'Direct database query test'
+      });
+    } catch (error) {
+      logger.error('Database test failed:', error);
+      next(error);
+    }
+  }
+
+  static async ping(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      res.json({
+        success: true,
+        message: 'Equipment controller is working',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 } 

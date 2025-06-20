@@ -126,10 +126,20 @@ export default function ArticulatedDieselBoomLiftsPage() {
   const [specsAnchorEl, setSpecsAnchorEl] = useState<null | HTMLElement>(null);
   const [activeModelId, setActiveModelId] = useState<number | null>(null);
 
+  // Map mock model names to database equipment UUIDs
+  const getEquipmentUUID = (modelName: string): string => {
+    const equipmentMap: {[key: string]: string} = {
+      'Genie Z-45/25J RT': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Maps to Genie Z-45 DC
+      // Add more mappings as needed for other models
+    };
+    
+    return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found
+  };
+
   const handleAddToQuote = (model: any) => {
     // Create pending item and let QuoteManager handle the workflow
     const pendingItem = {
-      modelId: model.id,
+      modelId: getEquipmentUUID(model.name), // Use correct equipment UUID
       modelName: model.name,
       manufacturer: model.manufacturer,
       category: 'Articulated Diesel Boom Lifts',

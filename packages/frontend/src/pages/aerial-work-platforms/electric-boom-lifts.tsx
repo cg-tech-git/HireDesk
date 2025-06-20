@@ -126,10 +126,24 @@ export default function ElectricBoomLiftsPage() {
   const [specsAnchorEl, setSpecsAnchorEl] = useState<null | HTMLElement>(null);
   const [activeModelId, setActiveModelId] = useState<number | null>(null);
 
+  // Map mock model names to database equipment UUIDs
+  const getEquipmentUUID = (modelName: string): string => {
+    const equipmentMap: {[key: string]: string} = {
+      'Genie Z-45 DC': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Exact match
+      'JLG E450AJ': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Map to similar Genie model as fallback
+      'Genie Z-60 DC': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Map to similar Genie model as fallback
+      'JLG E600J': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Map to similar Genie model as fallback
+      'Genie Z-80 DC': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Map to similar Genie model as fallback
+      'Genie Z-40/23N': '41a67e38-53f3-4c7b-ab9c-2a9f044d67f5', // Exact match
+    };
+    
+    return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found
+  };
+
   const handleAddToQuote = (model: any) => {
     // Create pending item and let QuoteManager handle the workflow
     const pendingItem = {
-      modelId: model.id,
+      modelId: getEquipmentUUID(model.name), // Use correct equipment UUID
       modelName: model.name,
       manufacturer: model.manufacturer,
       category: 'Electric Boom Lifts',

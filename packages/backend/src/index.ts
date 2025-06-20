@@ -2,8 +2,8 @@ import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-// Load environment variables
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+// Load environment variables from env.local (user couldn't create .env.local)
+dotenv.config({ path: path.resolve(process.cwd(), 'env.local') });
 
 import { createApp } from './app';
 import { initializeDatabase } from './config/database';
@@ -15,7 +15,9 @@ const PORT = process.env.PORT || 3001;
 async function startServer() {
   try {
     // Try to initialize database but don't fail if it's not available
-    if (!process.env.DEMO_MODE) {
+    const isDemoMode = process.env.DEMO_MODE === 'true';
+    
+    if (!isDemoMode) {
       logger.info('Initializing database connection...');
       try {
         await initializeDatabase();
@@ -31,7 +33,7 @@ async function startServer() {
     const server = app.listen(PORT, () => {
       logger.info(`Server is running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      logger.info(`Mode: ${process.env.DEMO_MODE ? 'Demo' : 'Normal'}`);
+      logger.info(`Mode: ${isDemoMode ? 'Demo' : 'Normal'}`);
       
       // Log available endpoints
       logger.info('Available endpoints:');

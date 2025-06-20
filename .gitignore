@@ -90,3 +90,10 @@ generated/
 # Images folder (too large for git)
 packages/frontend/public/images/brands/
 packages/frontend/public/images/equipment/ 
+# Exclude large image files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff

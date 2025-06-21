@@ -5,7 +5,7 @@ import {
   updateEquipmentSchema,
   searchEquipmentSchema,
   UserRole,
-} from '@hiredesk/shared';
+} from '../types/local-shared';
 import { EquipmentService } from '../services/equipment.service';
 import { ApiError } from '../middleware/error-handler';
 import { createLogger } from '../config/logger';
@@ -73,8 +73,12 @@ export class EquipmentController {
       const params = searchEquipmentSchema.parse(req.query);
       
       const result = await EquipmentService.findAll({
-        ...params,
-        isActive: req.user?.role === UserRole.ADMIN ? undefined : true,
+        page: params.page,
+        limit: params.limit,
+        sortBy: params.sortBy,
+        sortOrder: params.sortOrder,
+        categoryId: params.categoryId,
+        search: params.query,
       });
 
       res.json({
@@ -178,7 +182,7 @@ export class EquipmentController {
     try {
       const { id } = req.params;
       const rateCards = await EquipmentService.getRateCards(id);
-
+      
       res.json({
         success: true,
         data: rateCards,
@@ -226,16 +230,55 @@ export class EquipmentController {
   static async testDb(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { AppDataSource } = await import('../config/database');
-      const result = await AppDataSource.query('SELECT name, manufacturer, model_id, is_active FROM equipment LIMIT 5');
+      
+      // First check if initialized
+      const isInitialized = AppDataSource.isInitialized;
+      
+      if (!isInitialized) {
+        res.json({
+          success: false,
+          message: 'Database not initialized',
+          connectionInfo: {
+            host: process.env.DATABASE_HOST,
+            database: process.env.DATABASE_NAME,
+            user: process.env.DATABASE_USER,
+            isCloudSQL: process.env.DATABASE_HOST?.startsWith('/cloudsql/')
+          }
+        });
+        return;
+      }
+      
+      // Try a simple query
+      const result = await AppDataSource.query('SELECT COUNT(*) as count FROM equipment');
       
       res.json({
         success: true,
         data: result,
-        message: 'Direct database query test'
+        message: 'Database connection successful',
+        connectionInfo: {
+          host: process.env.DATABASE_HOST,
+          database: process.env.DATABASE_NAME,
+          user: process.env.DATABASE_USER,
+          isCloudSQL: process.env.DATABASE_HOST?.startsWith('/cloudsql/')
+        }
       });
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Database test failed:', error);
-      next(error);
+      res.status(500).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: error.code,
+          errno: error.errno,
+          syscall: error.syscall
+        },
+        connectionInfo: {
+          host: process.env.DATABASE_HOST,
+          database: process.env.DATABASE_NAME,
+          user: process.env.DATABASE_USER,
+          isCloudSQL: process.env.DATABASE_HOST?.startsWith('/cloudsql/')
+        }
+      });
     }
   }
 

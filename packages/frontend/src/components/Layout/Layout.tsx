@@ -309,7 +309,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       {
         text: 'Dashboard',
         icon: <DashboardIcon />,
-        path: '/dashboard',
+        path: '/',
         roles: [UserRole.CUSTOMER, UserRole.HIRE_DESK, UserRole.ADMIN],
       },
       {

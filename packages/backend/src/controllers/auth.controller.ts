@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { loginSchema, registerSchema } from '@hiredesk/shared';
+import { loginSchema, registerSchema } from '../types/local-shared';
 import { User } from '../entities/User';
 import { UserProfile } from '../entities/UserProfile';
 import { ApiError } from '../middleware/error-handler';

@@ -142,12 +142,12 @@ export default function MaterialLiftsPage() {
   // Map mock model names to database equipment UUIDs
   const getEquipmentUUID = (modelName: string): string => {
     const equipmentMap: {[key: string]: string} = {
-      'Genie SLC-24': 'c9c1dc25-138a-49db-8d5f-6a8a7a849521', // Exact match
-      'Genie SLC-18': '2e080142-5202-43d0-adfc-1d70ea5dff96', // Exact match
-      'Genie GL-12': '1441b672-8931-43bf-a8d6-6456cc184298', // Exact match
-      'Genie GL-8': 'a7ffc2dc-64ec-414c-92cc-b50881a11b59', // Exact match
-      'Genie GL-4': '83b301b0-dd38-440e-99c8-9910a22f5ef2', // Exact match
-      'Genie GL-10': '1b58772f-0167-4015-9757-a3c5e1baf5d6', // Exact match
+      'Genie SLC-24': 'c9c1dc25-138a-49db-8d5f-6a8a7a849521',
+      'Genie SLC-18': '2e080142-5202-43d0-adfc-1d70ea5dff96',
+      'Genie GL-12': '1441b672-8931-43bf-a8d6-6456cc184298',
+      'Genie GL-8': 'a7ffc2dc-64ec-414c-92cc-b50881a11b59',
+      'Genie GL-4': '83b301b0-dd38-440e-99c8-9910a22f5ef2',
+      'Genie GL-10': '1b58772f-0167-4015-9757-a3c5e1baf5d6',
     };
     
     return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found

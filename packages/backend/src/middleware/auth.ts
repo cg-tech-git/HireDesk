@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyIdToken } from '../config/firebase';
-import { UserRole } from '@hiredesk/shared';
+import { UserRole } from '../types/local-shared';
 import { createLogger } from '../config/logger';
 import { User } from '../entities/User';
 

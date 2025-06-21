@@ -129,12 +129,12 @@ export default function PersonnelLiftsPage() {
   // Map mock model names to database equipment UUIDs
   const getEquipmentUUID = (modelName: string): string => {
     const equipmentMap: {[key: string]: string} = {
-      'Genie AWP-30S': '0982f98f-e868-46ba-b049-91e8d9f9d4eb', // Exact match
-      'JLG 25AM': '0982f98f-e868-46ba-b049-91e8d9f9d4eb', // Map to similar Genie model as fallback
-      'Genie AWP-25S': 'e3cafc5f-4e1c-45e5-b45f-de1bafaad12e', // Exact match
-      'JLG 20AM': 'e3cafc5f-4e1c-45e5-b45f-de1bafaad12e', // Map to similar Genie model as fallback
-      'Genie AWP-20S': '0bec519d-b364-493d-8207-076353ddba5a', // Exact match
-      'JLG 15MSP': '0bec519d-b364-493d-8207-076353ddba5a', // Map to similar Genie model as fallback
+      'Genie AWP-30S': '0982f98f-e868-46ba-b049-91e8d9f9d4eb',
+      'JLG 25AM': '00a01530-1699-4832-bda5-0b069a5034ac',
+      'Genie AWP-25S': 'e3cafc5f-4e1c-45e5-b45f-de1bafaad12e',
+      'JLG 20AM': '82495e4f-9b25-4818-9e65-a55a6bb6a915',
+      'Genie AWP-20S': '0bec519d-b364-493d-8207-076353ddba5a',
+      'JLG 15MSP': 'f084dd67-0758-4095-bf04-3b6e47621fde',
     };
     
     return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found

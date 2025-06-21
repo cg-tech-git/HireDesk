@@ -20,7 +20,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { userProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,10 +35,10 @@ export default function Login() {
     setError(null);
 
     try {
-      await login(data.email, data.password);
-      router.push('/dashboard');
+      // In demo mode, just redirect to home page
+      router.push('/');
     } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to login');
+      setError('Login functionality coming soon');
     } finally {
       setLoading(false);
     }

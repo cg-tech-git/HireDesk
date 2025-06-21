@@ -1,0 +1,5 @@
+id,name,description,price,type,is_active,created_at,updated_at
+5f35f20c-1d7b-4326-832b-33237f309f49,Insurance,Equipment damage waiver insurance,50.00,insurance,t,2025-06-20 19:01:35.243007+00,2025-06-20 19:01:35.243007+00
+7bb0938c-c34d-4395-91e2-eb0f6995e002,Collection,Equipment collection from site,150.00,delivery,t,2025-06-20 19:01:35.243007+00,2025-06-20 19:01:35.243007+00
+a73005f1-d108-4111-975b-2e3b6204a681,Delivery,Equipment delivery to site,150.00,delivery,t,2025-06-20 19:01:35.243007+00,2025-06-20 19:01:35.243007+00
+e46f6850-88f0-4f11-abe4-a43c97bf39f0,Cleaning,Equipment cleaning service,75.00,cleaning,t,2025-06-20 19:01:35.243007+00,2025-06-20 19:01:35.243007+00

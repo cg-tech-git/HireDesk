@@ -5,17 +5,21 @@ import { parse } from 'csv-parse/sync';
 import * as fs from 'fs';
 import * as path from 'path';
 import { createLogger } from '../packages/backend/src/config/logger';
+import { Category } from '../packages/backend/src/entities/Category';
+import { Equipment } from '../packages/backend/src/entities/Equipment';
+import { RateCard } from '../packages/backend/src/entities/RateCard';
 
-// Database configuration
+// Create database connection (using your existing connection from backend)
 const dataSource = new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
-  database: process.env.DB_NAME || 'hiredesk',
+  host: process.env.DATABASE_HOST || 'localhost',
+  port: parseInt(process.env.DATABASE_PORT || '5433', 10), // Changed to 5433 for Cloud SQL proxy
+  username: process.env.DATABASE_USER || 'hiredesk_user',
+  password: process.env.DATABASE_PASSWORD || 'hiredesk_prod_2024',
+  database: process.env.DATABASE_NAME || 'hiredesk_db', // Changed to hiredesk_db
+  entities: [Category, Equipment, RateCard],
   synchronize: false,
-  logging: false,
+  logging: false
 });
 
 const logger = createLogger('pricing-import');
@@ -48,8 +52,6 @@ interface PricingData {
 }
 
 class PricingImporter {
-  private logId: string = '';
-
   async import(csvFilePath: string): Promise<void> {
     try {
       await dataSource.initialize();
@@ -64,9 +66,6 @@ class PricingImporter {
 
       logger.info(`Found ${records.length} pricing records in CSV`);
 
-      // Start import log
-      this.logId = await this.createImportLog(path.basename(csvFilePath), records.length);
-
       // Process data
       const { equipmentData, pricingData } = this.processRecords(records);
       
@@ -77,15 +76,11 @@ class PricingImporter {
         await this.importPricing(manager, pricingData);
       });
 
-      await this.updateImportLog('completed', records.length, 0);
       logger.info('Import completed successfully');
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       logger.error('Import failed:', errorMessage);
-      if (this.logId) {
-        await this.updateImportLog('failed', 0, 0, { error: errorMessage });
-      }
       throw error;
     } finally {
       await dataSource.destroy();
@@ -166,27 +161,43 @@ class PricingImporter {
     let importedCount = 0;
 
     for (const eq of equipmentData) {
-      const result = await manager.query(`
-        INSERT INTO equipment (model_id, name, manufacturer, category_id, description, is_active)
-        SELECT $1, $2, $3, cat.id, $4, true
-        FROM categories cat
-        WHERE cat.name = $5 AND cat.parent_id IS NOT NULL
-        ON CONFLICT (model_id) 
-        DO UPDATE SET 
-          name = EXCLUDED.name,
-          manufacturer = EXCLUDED.manufacturer,
-          description = EXCLUDED.description,
-          updated_at = CURRENT_TIMESTAMP
-        RETURNING id
-      `, [
-        eq.modelId,
-        eq.name,
-        eq.manufacturer,
-        `${eq.manufacturer} ${eq.name} - Professional aerial work platform for construction and industrial applications`,
-        eq.subCategory
-      ]);
+      // First check if equipment exists
+      const existing = await manager.query(
+        `SELECT id FROM equipment WHERE name = $1`,
+        [eq.name]
+      );
 
-      if (result.length > 0) {
+      if (existing.length === 0) {
+        // Insert new equipment
+        const result = await manager.query(`
+          INSERT INTO equipment (name, category_id, description, specifications, is_active)
+          SELECT $1, cat.id, $2, $3, true
+          FROM categories cat
+          WHERE cat.name = $4 AND cat.parent_id IS NOT NULL
+          RETURNING id
+        `, [
+          eq.name,
+          `${eq.manufacturer} ${eq.name} - Professional aerial work platform for construction and industrial applications`,
+          JSON.stringify({ manufacturer: eq.manufacturer, modelId: eq.modelId }),
+          eq.subCategory
+        ]);
+
+        if (result.length > 0) {
+          importedCount++;
+        }
+      } else {
+        // Update existing equipment
+        await manager.query(`
+          UPDATE equipment 
+          SET description = $1, 
+              specifications = $2,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE name = $3
+        `, [
+          `${eq.manufacturer} ${eq.name} - Professional aerial work platform for construction and industrial applications`,
+          JSON.stringify({ manufacturer: eq.manufacturer, modelId: eq.modelId }),
+          eq.name
+        ]);
         importedCount++;
       }
     }
@@ -198,79 +209,54 @@ class PricingImporter {
     let importedCount = 0;
 
     for (const pricing of pricingData) {
-      // Insert into equipment_pricing table
-      const result = await manager.query(`
-        INSERT INTO equipment_pricing (equipment_id, pricing_tier_id, daily_rate, effective_date, is_active)
-        SELECT 
-          eq.id,
-          pt.id,
-          $1,
-          CURRENT_DATE,
-          true
-        FROM equipment eq
-        JOIN pricing_tiers pt ON pt.duration_min = $2 AND pt.duration_max = $3
-        WHERE eq.model_id = $4
-        ON CONFLICT (equipment_id, pricing_tier_id, effective_date)
-        DO UPDATE SET 
-          daily_rate = EXCLUDED.daily_rate,
-          updated_at = CURRENT_TIMESTAMP
-        RETURNING id
-      `, [
-        pricing.rate,
-        pricing.minDays,
-        pricing.maxDays,
-        pricing.modelId
-      ]);
+      // Get equipment by name (from modelId stored in specifications)
+      const eqResult = await manager.query(`
+        SELECT id FROM equipment 
+        WHERE specifications->>'modelId' = $1
+      `, [pricing.modelId]);
 
-      // Also insert into legacy rate_cards table for compatibility
-      await manager.query(`
-        INSERT INTO rate_cards (equipment_id, duration_min, duration_max, daily_rate, period, is_active)
-        SELECT eq.id, $1, $2, $3, $4, true
-        FROM equipment eq
-        WHERE eq.model_id = $5
-        ON CONFLICT (equipment_id, duration_min, duration_max)
-        DO UPDATE SET 
-          daily_rate = EXCLUDED.daily_rate,
-          period = EXCLUDED.period,
-          updated_at = CURRENT_TIMESTAMP
-      `, [
-        pricing.minDays,
-        pricing.maxDays,
-        pricing.rate,
-        pricing.period,
-        pricing.modelId
-      ]);
+      if (eqResult.length > 0) {
+        const equipmentId = eqResult[0].id;
+        
+        // Check if rate card exists
+        const existing = await manager.query(`
+          SELECT id FROM rate_cards 
+          WHERE equipment_id = $1 AND duration_min = $2 AND duration_max = $3
+        `, [equipmentId, pricing.minDays, pricing.maxDays]);
 
-      if (result.length > 0) {
-        importedCount++;
+        if (existing.length === 0) {
+          // Insert new rate card
+          await manager.query(`
+            INSERT INTO rate_cards (equipment_id, duration_min, duration_max, daily_rate, is_active)
+            VALUES ($1, $2, $3, $4, true)
+          `, [
+            equipmentId,
+            pricing.minDays,
+            pricing.maxDays,
+            pricing.rate
+          ]);
+          importedCount++;
+        } else {
+          // Update existing rate card
+          await manager.query(`
+            UPDATE rate_cards 
+            SET daily_rate = $1, updated_at = CURRENT_TIMESTAMP
+            WHERE equipment_id = $2 AND duration_min = $3 AND duration_max = $4
+          `, [
+            pricing.rate,
+            equipmentId,
+            pricing.minDays,
+            pricing.maxDays
+          ]);
+          importedCount++;
+        }
       }
     }
 
     logger.info(`Imported/updated ${importedCount} pricing records`);
   }
 
-  private async createImportLog(filename: string, totalRows: number): Promise<string> {
-    const result = await dataSource.query(`
-      INSERT INTO pricing_import_logs (filename, total_rows, processed_rows, error_rows, status)
-      VALUES ($1, $2, 0, 0, 'processing')
-      RETURNING id
-    `, [filename, totalRows]);
-    
-    return result[0].id;
-  }
 
-  private async updateImportLog(
-    status: string, 
-    processedRows: number, 
-    errorRows: number, 
-    errorDetails?: any
-  ): Promise<void> {
-    await dataSource.query(`
-      UPDATE pricing_import_logs 
-      SET status = $1, processed_rows = $2, error_rows = $3, error_details = $4, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $5
-    `, [status, processedRows, errorRows, errorDetails ? JSON.stringify(errorDetails) : null, this.logId]);
-  }
 }
 
 // Main execution

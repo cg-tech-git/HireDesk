@@ -60,18 +60,39 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
       
       for (const equipmentId of uniqueEquipmentIds) {
         try {
-          const response = await fetch(`http://localhost:3001/api/v1/equipment/test-rates/${equipmentId}`);
+          // Use environment variable or fallback to localhost
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+          
+          console.log(`Fetching rates for equipment ${equipmentId} from ${apiUrl}`);
+          
+          // Use rate-cards endpoint which is now public
+          const response = await fetch(`${apiUrl}/equipment/${equipmentId}/rate-cards`);
+          
+          if (!response.ok) {
+            console.error(`Failed to fetch rates for ${equipmentId}: ${response.status} ${response.statusText}`);
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            ratesData[equipmentId] = [];
+            continue;
+          }
+          
           const data = await response.json();
+          console.log(`Rate response for ${equipmentId}:`, data);
+          
           if (data.success && data.data) {
             ratesData[equipmentId] = data.data;
+          } else {
+            console.warn(`No rates found for equipment ${equipmentId}:`, data);
+            ratesData[equipmentId] = [];
           }
         } catch (error) {
           console.error(`Error fetching rates for ${equipmentId}:`, error);
           ratesData[equipmentId] = [];
         }
-              }
-        
-        setEquipmentRates(ratesData);
+      }
+      
+      console.log('All fetched rates:', ratesData);
+      setEquipmentRates(ratesData);
     };
     
     if (items.length > 0) {
@@ -82,7 +103,11 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
   // Calculate total amount based on pricing tiers and periods
   const calculateAmount = (equipmentId: string, days: number): number => {
     const rates = equipmentRates[equipmentId];
-    if (!rates) return 0;
+    if (!rates || rates.length === 0) {
+      // Return 0 to indicate database fetch failed
+      console.warn(`No rates available for equipment ${equipmentId} in calculateAmount, returning 0`);
+      return 0;
+    }
     
     const rateData = rates.find((r: any) => 
       days >= r.durationMin && days <= r.durationMax
@@ -114,7 +139,11 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
   // Get display rate and period for showing in the rate column
   const getDisplayRateAndPeriod = (equipmentId: string, days: number): { rate: number; period: string } => {
     const rates = equipmentRates[equipmentId];
-    if (!rates) return { rate: 0, period: 'Daily' };
+    if (!rates || rates.length === 0) {
+      // Return 0 as fallback to indicate database fetch failed
+      console.warn(`No rates available for equipment ${equipmentId}, returning 0`);
+      return { rate: 0, period: 'Daily' };
+    }
     
     const rateData = rates.find((r: any) => 
       days >= r.durationMin && days <= r.durationMax
@@ -172,13 +201,30 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
     // Generate quote number
     const quoteNumber = `HD-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
     
-    // Create saved quote object
+    // Create saved quote object with rate information
     const savedQuote: SavedQuote = {
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       quoteNumber,
       projectRef: customerDetails.projectRef,
       createdAt: new Date().toISOString(),
-      items,
+      items: items.map(item => ({
+        ...item,
+        dates: item.dates.map(date => {
+          const days = date.startDate && date.endDate 
+            ? Math.ceil((new Date(date.endDate).getTime() - new Date(date.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
+            : 0;
+          
+          const { rate: displayRate, period } = getDisplayRateAndPeriod(item.modelId, days);
+          const amount = calculateAmount(item.modelId, days);
+          
+          return {
+            ...date,
+            rate: displayRate,
+            period: period,
+            amount: amount
+          };
+        })
+      })),
       customer: {
         name: customerDetails.name,
         email: customerDetails.email,
@@ -212,8 +258,6 @@ export function QuoteQuickView({ open, onClose }: QuoteQuickViewProps) {
     router.push('/quotes');
     handleMenuClose();
   };
-
-
 
   const handleClearQuote = () => {
     dispatch(clearQuote());

@@ -97,3 +97,4 @@ packages/frontend/public/images/equipment/
 *.gif
 *.bmp
 *.tiff
+cloud-sql-proxy

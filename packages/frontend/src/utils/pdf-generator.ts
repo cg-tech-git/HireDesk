@@ -2,30 +2,15 @@ import jsPDF from 'jspdf';
 import { SavedQuote } from '@/store/savedQuotesSlice';
 import { format } from 'date-fns';
 
-// Helper function to get rate and period information (matches frontend logic)
-const getRateAndPeriod = (days: number) => {
-  if (days >= 1 && days <= 7) {
-    return { rate: 700, period: 'Daily' }; // Default daily rate
-  } else if (days >= 8 && days <= 14) {
-    return { rate: 2000, period: 'Weekly' }; // Default weekly rate
-  } else if (days >= 15) {
-    return { rate: 3500, period: 'Monthly' }; // Default monthly rate
-  }
-  return { rate: 700, period: 'Daily' };
-};
-
-// Helper function to calculate amount based on period
-const calculateAmount = (rate: number, period: string, days: number) => {
-  if (period === 'Daily') {
-    return rate * days;
-  } else if (period === 'Weekly') {
-    const weeks = days / 7;
-    return rate * weeks;
-  } else if (period === 'Monthly') {
-    const months = Math.max(1, days / 30);
-    return rate * months;
-  }
-  return rate * days; // Fallback
+// Helper function to format numbers with thousand separators and 2 decimal places
+const formatCurrency = (value: number | string): string => {
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  // Format with thousand separators and 2 decimal places
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    useGrouping: true
+  });
 };
 
 export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
@@ -109,9 +94,9 @@ export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
   doc.setFont(undefined, 'bold');
   
   addText('Equipment', 20, currentY);
-  addText('Start', 80, currentY);
-  addText('End', 105, currentY);
-  addText('Days', 125, currentY, { align: 'center' });
+  addText('Start', 70, currentY);
+  addText('End', 95, currentY);
+  addText('Days', 120, currentY, { align: 'center' });
   addText('Rate', 145, currentY, { align: 'right' });
   addText('Period', 165, currentY, { align: 'center' });
   addText('Amount', pageWidth - 20, currentY, { align: 'right' });
@@ -145,10 +130,6 @@ export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
       const days = date.startDate && date.endDate 
         ? Math.ceil((new Date(date.endDate).getTime() - new Date(date.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
         : 0;
-
-      // Get rate and period information based on days
-      const { rate, period } = getRateAndPeriod(days);
-      const totalAmount = calculateAmount(rate, period, days);
       
       doc.setFontSize(8);
       doc.setTextColor(24, 48, 87);
@@ -167,12 +148,18 @@ export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
       doc.setFont(undefined, 'normal');
       doc.setFontSize(8);
       doc.setTextColor(24, 48, 87);
-      addText(date.startDate ? format(new Date(date.startDate), 'dd/MM/yyyy') : '-', 80, currentY);
-      addText(date.endDate ? format(new Date(date.endDate), 'dd/MM/yyyy') : '-', 105, currentY);
-      addText(days.toString(), 125, currentY, { align: 'center' });
-      addText(rate.toFixed(2), 145, currentY, { align: 'right' });
+      addText(date.startDate ? format(new Date(date.startDate), 'dd/MM/yyyy') : '-', 70, currentY);
+      addText(date.endDate ? format(new Date(date.endDate), 'dd/MM/yyyy') : '-', 95, currentY);
+      addText(days.toString(), 120, currentY, { align: 'center' });
+      
+      // Use the rate and period from the saved quote data
+      const rate = date.rate || 0;
+      const period = date.period || 'Daily';
+      const amount = date.amount || 0;
+      
+      addText(formatCurrency(rate), 145, currentY, { align: 'right' });
       addText(period, 165, currentY, { align: 'center' });
-      addText(totalAmount.toFixed(2), pageWidth - 20, currentY, { align: 'right' });
+      addText(formatCurrency(amount), pageWidth - 20, currentY, { align: 'right' });
       
       currentY += 12; // Spacing to accommodate category text
     });
@@ -191,11 +178,11 @@ export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
   doc.setFont(undefined, 'normal');
   
   addText('Subtotal:', 140, currentY);
-  addText(quote.totals.subtotal.toFixed(2), pageWidth - 20, currentY, { align: 'right' });
+  addText(formatCurrency(quote.totals.subtotal), pageWidth - 20, currentY, { align: 'right' });
   
   currentY += 8;
   addText('VAT (5%):', 140, currentY);
-  addText(quote.totals.vat.toFixed(2), pageWidth - 20, currentY, { align: 'right' });
+  addText(formatCurrency(quote.totals.vat), pageWidth - 20, currentY, { align: 'right' });
   
   currentY += 8;
   
@@ -208,7 +195,7 @@ export const generateQuotePDF = (quote: SavedQuote): jsPDF => {
   doc.setFont(undefined, 'bold');
   doc.setFontSize(10);
   addText('Total:', 140, currentY);
-  addText(quote.totals.total.toFixed(2), pageWidth - 20, currentY, { align: 'right' });
+  addText(formatCurrency(quote.totals.total), pageWidth - 20, currentY, { align: 'right' });
 
   // Simple demo footer
   const pageHeight = doc.internal.pageSize.getHeight();

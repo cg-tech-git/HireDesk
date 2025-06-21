@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { QuoteStatus } from '@hiredesk/shared';
+import { QuoteStatus } from '../types/local-shared';
 import { BaseEntity } from './BaseEntity';
 import { User } from './User';
 import { QuoteItem } from './QuoteItem';

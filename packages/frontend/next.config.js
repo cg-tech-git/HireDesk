@@ -2,21 +2,20 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: 'standalone', // Enable standalone output for Docker
   transpilePackages: ['@hiredesk/shared'],
   images: {
-    domains: ['storage.googleapis.com'], // For Google Cloud Storage images
+    domains: ['localhost', 'hiredesk-backend-544256061771.us-central1.run.app'],
   },
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://hiredesk-backend-544256061771.us-central1.run.app/api',
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
   async rewrites() {
-    // Only add rewrites if API URL is defined
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     return [
       {
         source: '/api/:path*',
-        destination: `${apiUrl}/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://hiredesk-backend-544256061771.us-central1.run.app/api'}/:path*`,
       },
     ];
   },

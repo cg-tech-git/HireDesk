@@ -139,12 +139,12 @@ export default function DieselScissorLiftsPage() {
   // Map mock model names to database equipment UUIDs
   const getEquipmentUUID = (modelName: string): string => {
     const equipmentMap: {[key: string]: string} = {
-      'Genie GS-5390 RT': '1702d722-bcac-4cf0-ae31-76c166816e12', // Exact match
-      'JLG 530LRT': '1702d722-bcac-4cf0-ae31-76c166816e12', // Map to similar Genie model as fallback
-      'Genie GS-4390 RT': '15c91a3e-4443-4cbf-8333-f65e3a5ebb8a', // Exact match
-      'JLG 430LRT': '15c91a3e-4443-4cbf-8333-f65e3a5ebb8a', // Map to similar Genie model as fallback
-      'Genie GS-3390 RT': '1803c8e3-0ac2-4b6c-b18f-ee4ab0258ffa', // Exact match
-      'JLG 330LRT': '1803c8e3-0ac2-4b6c-b18f-ee4ab0258ffa', // Map to similar Genie model as fallback
+      'Genie GS-5390 RT': '1702d722-bcac-4cf0-ae31-76c166816e12',
+      'JLG 530LRT': 'f51850b3-9b68-40a0-bbe1-426ad3a198fd',
+      'Genie GS-4390 RT': '15c91a3e-4443-4cbf-8333-f65e3a5ebb8a',
+      'JLG 430LRT': 'f74e6cee-8df0-40b8-8d24-3245c008b836',
+      'Genie GS-3390 RT': '1803c8e3-0ac2-4b6c-b18f-ee4ab0258ffa',
+      'JLG 330LRT': '46b60884-2512-46df-8e5b-a0b3b0c788ab',
     };
     
     return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found

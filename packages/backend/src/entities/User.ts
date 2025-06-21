@@ -1,5 +1,5 @@
 import { Entity, Column, OneToOne, OneToMany, Index } from 'typeorm';
-import { UserRole } from '@hiredesk/shared';
+import { UserRole } from '../types/local-shared';
 import { BaseEntity } from './BaseEntity';
 import { UserProfile } from './UserProfile';
 import { Quote } from './Quote';

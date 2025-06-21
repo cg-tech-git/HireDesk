@@ -140,11 +140,11 @@ export default function TelescopicDieselBoomLiftsPage() {
   const getEquipmentUUID = (modelName: string): string => {
     const equipmentMap: {[key: string]: string} = {
       'Genie S-60 XC': '6ccc5c52-8f0d-4f87-879a-d8c18b605368',
-      'JLG 660SJ': '6ccc5c52-8f0d-4f87-879a-d8c18b605368', // Map to similar Genie model as fallback
+      'JLG 660SJ': '8d7da5f4-c56d-454f-bd6f-1a20c393c18e',
       'Genie S-85 XC': 'c3637ef2-9e37-455f-a93f-40e374808190',
-      'JLG 860SJ': 'c3637ef2-9e37-455f-a93f-40e374808190', // Map to similar Genie model as fallback
+      'JLG 860SJ': '2bca844d-a7a1-4256-b89b-648908b36708',
       'Genie SX-105 XC': '6246f529-948f-4977-b605-96a83cfbc120',
-      'JLG 1200SJP': '6246f529-948f-4977-b605-96a83cfbc120', // Map to similar Genie model as fallback
+      'JLG 1200SJP': '381c71da-b5de-41fa-bb88-021d6d370d82',
     };
     
     return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found

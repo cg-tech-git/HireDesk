@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { QuoteController } from '../controllers/quote.controller';
 import { authenticate, authorize } from '../middleware/auth';
-import { UserRole } from '@hiredesk/shared';
+import { UserRole } from '../types/local-shared';
 
 const router = Router();
 

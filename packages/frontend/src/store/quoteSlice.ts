@@ -21,7 +21,7 @@ export const quoteSlice = createSlice({
       state.items.push(action.payload);
       state.pendingItem = null; // Clear pending item after adding
     },
-    removeItem: (state, action: PayloadAction<number>) => {
+    removeItem: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter(item => item.modelId !== action.payload);
     },
     updateItem: (state, action: PayloadAction<QuoteItem>) => {

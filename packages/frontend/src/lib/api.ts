@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -19,9 +19,9 @@ export const apiEndpoints = {
     me: '/auth/me',
   },
   equipment: {
-    list: '/equipment/test',
+    list: '/equipment',
     get: (id: string) => `/equipment/${id}`,
-    rateCards: (id: string) => `/equipment/test-rates/${id}`,
+    rateCards: (id: string) => `/equipment/${id}/rate-cards`,
   },
   categories: {
     list: '/categories',

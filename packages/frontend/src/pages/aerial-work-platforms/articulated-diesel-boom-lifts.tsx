@@ -129,8 +129,12 @@ export default function ArticulatedDieselBoomLiftsPage() {
   // Map mock model names to database equipment UUIDs
   const getEquipmentUUID = (modelName: string): string => {
     const equipmentMap: {[key: string]: string} = {
-      'Genie Z-45/25J RT': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Maps to Genie Z-45 DC
-      // Add more mappings as needed for other models
+      'Genie Z-45/25J RT': '8d8bb077-8b74-43c3-8494-ec8dfdeec61f',
+      'JLG 450AJ': '18ea809e-35b0-4b85-aaf0-025dc7af20cb',
+      'Genie Z-62/40': 'd281d9b4-db4a-48f3-a310-ed7cc1650186',
+      'JLG 600AJ': '173835a5-b2e1-4525-916e-904ff5065d6b',
+      'Genie Z-80/60': '42f13371-b753-43bd-82ac-b1345f2987c4',
+      'JLG 800AJ': 'fad24016-d129-4a7e-862c-054bf83e81e8',
     };
     
     return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found

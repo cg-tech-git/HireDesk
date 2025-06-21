@@ -141,12 +141,12 @@ export default function ElectricScissorLiftsPage() {
   // Map mock model names to database equipment UUIDs
   const getEquipmentUUID = (modelName: string): string => {
     const equipmentMap: {[key: string]: string} = {
-      'Genie GS-4047': '3886bf1e-3852-440a-a0c5-987487bdf0e8', // Exact match
-      'JLG 4045R': '3886bf1e-3852-440a-a0c5-987487bdf0e8', // Map to similar Genie model as fallback
-      'Genie GS-3246': '7b93f451-de8d-42b2-b11c-1e7d338e1e6b', // Exact match
-      'JLG 3246ES': '7b93f451-de8d-42b2-b11c-1e7d338e1e6b', // Map to similar Genie model as fallback
-      'Genie GS-1930': '9648a6c3-a7a0-4301-a202-23b45d12e8c0', // Exact match
-      'JLG 1532R': '9648a6c3-a7a0-4301-a202-23b45d12e8c0', // Map to similar Genie model as fallback
+      'Genie GS-4047': '3886bf1e-3852-440a-a0c5-987487bdf0e8',
+      'JLG 4045R': '9fc08ba7-b394-4d87-94fb-82741ac4e29f',
+      'Genie GS-3246': '7b93f451-de8d-42b2-b11c-1e7d338e1e6b',
+      'JLG 3246ES': '5c23a45c-878d-4abe-95bc-4bc0f7df9fa1',
+      'Genie GS-1930': '9648a6c3-a7a0-4301-a202-23b45d12e8c0',
+      'JLG 1532R': '540a53dd-5027-495f-8d41-5701d4f3fc76',
     };
     
     return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found

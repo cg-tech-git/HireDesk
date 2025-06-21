@@ -7,7 +7,7 @@ import {
   quoteFilterSchema,
   UserRole,
   QuoteStatus,
-} from '@hiredesk/shared';
+} from '../types/local-shared';
 import { QuoteService } from '../services/quote.service';
 import { ApiError } from '../middleware/error-handler';
 import { createLogger } from '../config/logger';

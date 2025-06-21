@@ -3,6 +3,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface DateRange {
   startDate: string | null;
   endDate: string | null;
+  rate?: number;
+  period?: string;
+  amount?: number;
 }
 
 interface QuoteItem {

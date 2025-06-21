@@ -67,7 +67,7 @@ export function QuoteManager() {
         onClose={handleModalClose}
         onSubmit={handleModalSubmit}
         selectedModel={pendingItem ? {
-          id: pendingItem.modelId,
+          id: Number(pendingItem.modelId) || 0,
           name: pendingItem.modelName,
           manufacturer: pendingItem.manufacturer,
         } : null}

@@ -18,16 +18,45 @@ import {
   QUOTE_NUMBER_PREFIX,
   PaginatedResponse,
   PaginationParams,
-} from '@hiredesk/shared';
+} from '../types/local-shared';
 
 const logger = createLogger('quote-service');
 
 export class QuoteService {
-  private static quoteRepository = AppDataSource.getRepository(Quote);
-  private static quoteItemRepository = AppDataSource.getRepository(QuoteItem);
-  private static quoteServiceRepository = AppDataSource.getRepository(QuoteServiceEntity);
-  private static equipmentRepository = AppDataSource.getRepository(Equipment);
-  private static serviceRepository = AppDataSource.getRepository(Service);
+  private static get quoteRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getRepository(Quote);
+  }
+  
+  private static get quoteItemRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getRepository(QuoteItem);
+  }
+  
+  private static get quoteServiceRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getRepository(QuoteServiceEntity);
+  }
+  
+  private static get equipmentRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getRepository(Equipment);
+  }
+  
+  private static get serviceRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getRepository(Service);
+  }
 
   static async calculateQuote(input: CreateQuoteInput): Promise<QuoteCalculation> {
     const items = [];

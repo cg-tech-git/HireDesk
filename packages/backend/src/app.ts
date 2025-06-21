@@ -17,6 +17,11 @@ import quoteRoutes from './routes/quotes.routes';
 export function createApp(): Express {
   const app = express();
 
+  // Trust proxy for Cloud Run
+  if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', true);
+  }
+
   // Initialize Firebase only if not in demo mode
   if (!process.env.DEMO_MODE) {
     try {
@@ -33,7 +38,11 @@ export function createApp(): Express {
   
   // CORS configuration
   app.use(cors({
-    origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    origin: [
+      process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      'https://hiredesk-frontend-544256061771.us-central1.run.app',
+      'http://localhost:3001' // For local development
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -46,6 +55,8 @@ export function createApp(): Express {
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
+    // Skip IP check for Cloud Run
+    skip: (req) => process.env.NODE_ENV === 'production',
   });
   app.use('/api/', limiter);
 
@@ -70,6 +81,38 @@ export function createApp(): Express {
     });
   });
 
+  // Database debug endpoint (remove in production)
+  app.get('/api/v1/debug/database', async (req, res) => {
+    const { AppDataSource } = await import('./config/database');
+    const options = AppDataSource.options as any; // Type assertion for debugging
+    res.json({
+      isInitialized: AppDataSource.isInitialized,
+      options: {
+        type: options.type,
+        database: options.database,
+        host: options.host,
+        port: options.port,
+        username: options.username,
+        // Don't expose password
+        entities: options.entities?.length || 0,
+      },
+      environment: {
+        NODE_ENV: process.env.NODE_ENV,
+        DATABASE_HOST: process.env.DATABASE_HOST,
+        DATABASE_NAME: process.env.DATABASE_NAME,
+        DATABASE_USER: process.env.DATABASE_USER,
+        isCloudSQL: process.env.DATABASE_HOST?.startsWith('/cloudsql/'),
+      }
+    });
+  });
+
+  // Test direct database connection endpoint
+  app.get('/api/v1/debug/test-connection', async (req, res) => {
+    const { testDirectConnection } = await import('./config/database');
+    const result = await testDirectConnection();
+    res.json(result);
+  });
+
   // API version
   app.get('/api/v1', (req, res) => {
     res.json({
@@ -89,6 +132,11 @@ export function createApp(): Express {
   app.use('/api/v1/equipment', equipmentRoutes);
   app.use('/api/v1/quotes', quoteRoutes);
   // app.use('/api/v1/admin', adminRoutes);
+  
+  // Also mount routes without /v1 for backward compatibility
+  app.use('/api/auth', authRoutes);
+  app.use('/api/equipment', equipmentRoutes);
+  app.use('/api/quotes', quoteRoutes);
 
   // 404 handler
   app.use(notFoundHandler);

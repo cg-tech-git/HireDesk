@@ -1,5 +1,5 @@
 import { Entity, Column, OneToMany } from 'typeorm';
-import { ServiceType } from '@hiredesk/shared';
+import { ServiceType } from '../types/local-shared';
 import { BaseEntity } from './BaseEntity';
 import { QuoteService } from './QuoteService';
 

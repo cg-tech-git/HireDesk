@@ -129,12 +129,12 @@ export default function ElectricBoomLiftsPage() {
   // Map mock model names to database equipment UUIDs
   const getEquipmentUUID = (modelName: string): string => {
     const equipmentMap: {[key: string]: string} = {
-      'Genie Z-45 DC': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Exact match
-      'JLG E450AJ': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Map to similar Genie model as fallback
-      'Genie Z-60 DC': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Map to similar Genie model as fallback
-      'JLG E600J': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Map to similar Genie model as fallback
-      'Genie Z-80 DC': '68d96af4-6399-4798-ae97-47fec0c4fcba', // Map to similar Genie model as fallback
-      'Genie Z-40/23N': '41a67e38-53f3-4c7b-ab9c-2a9f044d67f5', // Exact match
+      'Genie Z-45 DC': '68d96af4-6399-4798-ae97-47fec0c4fcba',
+      'JLG E450AJ': 'b6a59b9d-cb93-4b81-8496-d8296e242a4a',
+      'Genie Z-60 DC': '189a3e33-da84-4a3d-80d7-3ea3f115274f',
+      'JLG E600J': '7f773c94-8082-49f4-a089-e6c3a9de7d18',
+      'Genie Z-80 DC': '8d28ec06-2684-403d-870a-948e503a4317',
+      'Genie Z-40/23N': '41a67e38-53f3-4c7b-ab9c-2a9f044d67f5',
     };
     
     return equipmentMap[modelName] || modelName; // Fallback to original if no mapping found

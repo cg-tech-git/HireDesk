@@ -1,4 +1,4 @@
-import { api, apiEndpoints } from '@/lib/api';
+import api, { apiEndpoints } from '@/lib/api';
 import { 
   Quote,
   QuoteWithItems,

@@ -10,14 +10,32 @@ import {
   PaginationParams,
   CreateEquipmentInput,
   UpdateEquipmentInput,
-} from '@hiredesk/shared';
+} from '../types/local-shared';
 
 const logger = createLogger('equipment-service');
 
 export class EquipmentService {
-  private static equipmentRepository = AppDataSource.getRepository(Equipment);
-  private static categoryRepository = AppDataSource.getRepository(Category);
-  private static rateCardRepository = AppDataSource.getRepository(RateCard);
+  // Remove static initialization and use getter methods instead
+  private static get equipmentRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getRepository(Equipment);
+  }
+  
+  private static get categoryRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getRepository(Category);
+  }
+  
+  private static get rateCardRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getRepository(RateCard);
+  }
 
   static async findAll(
     params: PaginationParams & { categoryId?: string; search?: string; isActive?: boolean }

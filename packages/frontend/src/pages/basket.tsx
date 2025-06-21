@@ -35,12 +35,12 @@ import { Layout } from '@/components/Layout/Layout';
 import { useBasket } from '@/contexts/BasketContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, differenceInDays } from 'date-fns';
-import { api, apiEndpoints } from '@/lib/api';
+import api, { apiEndpoints } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export default function BasketPage() {
   const router = useRouter();
-  const { currentUser } = useAuth();
+  const { userProfile } = useAuth();
   const { items, removeItem, updateItemDates, clearBasket, getTotalDays } = useBasket();
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,7 +74,7 @@ export default function BasketPage() {
   };
 
   const handleSubmitQuote = async () => {
-    if (!currentUser) {
+    if (!userProfile) {
       toast.error('Please login to submit a quote');
       router.push('/login');
       return;

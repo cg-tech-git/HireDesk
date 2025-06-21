@@ -17,7 +17,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import NextLink from 'next/link';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { api, apiEndpoints } from '@/lib/api';
+import api, { apiEndpoints } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 interface RegisterFormData {

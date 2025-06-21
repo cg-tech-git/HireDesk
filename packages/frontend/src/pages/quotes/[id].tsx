@@ -64,7 +64,8 @@ export default function QuoteDetailPage() {
 
     setIsDownloading(true);
     try {
-      generateQuotePDF(quote);
+      // For alpha testing - cast the quote type
+      generateQuotePDF(quote as any);
       toast.success('PDF downloaded successfully');
     } catch (error) {
       console.error('PDF generation error:', error);

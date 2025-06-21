@@ -6,13 +6,24 @@ import { createLogger } from '../config/logger';
 import {
   CreateCategoryInput,
   UpdateCategoryInput,
-} from '@hiredesk/shared';
+} from '../types/local-shared';
 
 const logger = createLogger('category-service');
 
 export class CategoryService {
-  private static categoryRepository = AppDataSource.getRepository(Category);
-  private static treeRepository = AppDataSource.getTreeRepository(Category);
+  private static get categoryRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getRepository(Category);
+  }
+
+  private static get treeRepository() {
+    if (!AppDataSource.isInitialized) {
+      throw new ApiError(500, 'DATABASE_NOT_INITIALIZED', 'Database connection not initialized');
+    }
+    return AppDataSource.getTreeRepository(Category);
+  }
 
   static async findAll(includeInactive = false): Promise<Category[]> {
     const where: FindOptionsWhere<Category> = {};

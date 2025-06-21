@@ -1,0 +1,9 @@
+id,name,description,parent_id,image_url,display_order,is_active,created_at,updated_at
+c684c558-ca25-47b3-89ae-d4047808a255,Aerial Work Platforms,Equipment category: Aerial Work Platforms,,,0,t,2025-06-20 19:01:34.363141+00,2025-06-20 19:01:34.363141+00
+008dd4f3-ae7f-4978-b864-26e146fad66d,Articulated Diesel Boom Lifts,Equipment subcategory: Articulated Diesel Boom Lifts,c684c558-ca25-47b3-89ae-d4047808a255,,0,t,2025-06-20 19:01:34.583778+00,2025-06-20 19:01:34.583778+00
+0223f70b-4668-4759-b1b2-74b6ca4fb690,Telescopic Diesel Boom Lifts,Equipment subcategory: Telescopic Diesel Boom Lifts,c684c558-ca25-47b3-89ae-d4047808a255,,0,t,2025-06-20 19:01:34.583778+00,2025-06-20 19:01:34.583778+00
+085990ce-3d1b-4312-92ea-39e6ce2eb85d,Personnel Lifts,Equipment subcategory: Personnel Lifts,c684c558-ca25-47b3-89ae-d4047808a255,,0,t,2025-06-20 19:01:34.583778+00,2025-06-20 19:01:34.583778+00
+3b373cfd-47b9-4b5f-9139-874259d758c6,Diesel Scissor Lifts,Equipment subcategory: Diesel Scissor Lifts,c684c558-ca25-47b3-89ae-d4047808a255,,0,t,2025-06-20 19:01:34.583778+00,2025-06-20 19:01:34.583778+00
+3e969a1e-17de-48e8-9b99-94dec689ed5f,Electric Boom Lifts,Equipment subcategory: Electric Boom Lifts,c684c558-ca25-47b3-89ae-d4047808a255,,0,t,2025-06-20 19:01:34.583778+00,2025-06-20 19:01:34.583778+00
+62ae7531-296d-4dd4-a0d3-93ea8603378e,Electric Scissor Lifts,Equipment subcategory: Electric Scissor Lifts,c684c558-ca25-47b3-89ae-d4047808a255,,0,t,2025-06-20 19:01:34.583778+00,2025-06-20 19:01:34.583778+00
+b20ce889-36b7-46f3-89f2-889042768a70,Material Lifts,Equipment subcategory: Material Lifts,c684c558-ca25-47b3-89ae-d4047808a255,,0,t,2025-06-20 19:01:34.583778+00,2025-06-20 19:01:34.583778+00
